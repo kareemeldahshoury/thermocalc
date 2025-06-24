@@ -110,11 +110,20 @@ const specHeat = [
   console.log(payload); 
 
   try {
-    const response = await fetch('http://localhost:8000/api/calculate/satwater', {
+    let endpoint = '';
+    if (selectedFluid.includes('satWater')) {
+      endpoint = 'http://localhost:8000/api/calculate/satwater';
+    } else if (selectedFluid === 'superheatedH20') {
+      endpoint = 'http://localhost:8000/api/calculate/superHeatedWater';
+    }
+
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
+
+  
 
     if (!response.ok) throw new Error('Server error');
 
