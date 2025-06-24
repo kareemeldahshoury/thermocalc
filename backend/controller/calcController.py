@@ -6,4 +6,3 @@ def handle_calculation(fluid_type: str, substance: str, inputs: dict):
         return calc.calculate()
     else:
         return "Calculation not implemented yet."
-

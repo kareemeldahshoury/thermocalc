@@ -1,4 +1,5 @@
 <script lang="ts">
+  // Your original FluidType and data arrays
   type FluidType = 'satWaterP' | 'satWaterT' | 'superheatedH20' | 'compLiqWat' | 'satIceWat' | 'satR134T' | 'satR134P' | 'superheatedR134' | 'idealAir' | 'idealN2' | 'idealO2'
   | 'idealCO2' | 'idealCO' | 'idealH2' | 'idealH2O' | 'idealO' | 'molGCP' | 'specHeat300' | 'specHeat';
 
@@ -39,6 +40,7 @@
   { id: 'xenon', name: 'Xenon (Xe)' }
 ];
 
+
 const specHeat300Substances = [
   { id: 'air', name: 'Air' },
   { id: 'argon', name: 'Argon (Ar)' },
@@ -67,84 +69,70 @@ const specHeat = [
     { id: 'o2', name: 'Oxygen (O₂)' }
   ];
 
-
-
   let selectedFluid: FluidType | '' = '';
   let selectedSubstance = '';
 
+  // 🟢 NEW: Object to store user-entered input values
+  let inputValues: Record<string, string> = {};
 
+  // 🟢 NEW: Result message display
+  let resultMessage = '';
 
   const fluidInputs: Record<FluidType, Array<{id: string, label: string}>> = {
-
-    molGCP: [],
-
-    specHeat300: [],
-
-    specHeat: [
-      { id: 'temperature', label: 'Temperature'}
-    ],
-
-    satWaterP: [
-      { id: 'quality', label: 'Quality' },
-      { id: 'pressure', label: 'Pressure' }
-    ],
-    satWaterT: [
-      { id: 'quality', label: 'Quality' },
-      { id: 'temperature', label: 'Temperature' }
-    ],
-    superheatedH20: [
-      { id: 'temperature', label: 'Temperature' },
-      { id: 'pressure', label: 'Pressure' }
-    ],
-    compLiqWat: [
-      { id: 'temperature', label: 'Temperature' },
-      { id: 'pressure', label: 'Pressure' }
-    ],
-    satIceWat: [
-      { id: 'quality', label: 'Quality' },
-      { id: 'temperature', label: 'Temperature' }
-  ],
-  satR134T: [
-      { id: 'quality', label: 'Quality' },
-      { id: 'temperature', label: 'Temperature' }
-    ],
-    satR134P: [
-      { id: 'quality', label: 'Quality' },
-      { id: 'pressure', label: 'Pressure' }
-    ],
-    superheatedR134: [
-      { id: 'temperature', label: 'Temperature' },
-      { id: 'pressure', label: 'Pressure' }
-    ],
-    idealAir: [
-      { id: 'temperature', label: 'Temperature' },
-  ],
-    idealN2: [
-      { id: 'temperature', label: 'Temperature' },
-  ],
-    idealO2: [
-      { id: 'temperature', label: 'Temperature' },
-  ],
-    idealCO2: [
-      { id: 'temperature', label: 'Temperature' },
-  ],
-    idealCO: [
-      { id: 'temperature', label: 'Temperature' },
-  ],
-    idealH2: [
-      { id: 'temperature', label: 'Temperature' },
-  ],
-    idealH2O: [
-      { id: 'temperature', label: 'Temperature' },
-  ],
-  idealO: [
-      { id: 'temperature', label: 'Temperature' },
-  ],
-
-
+    molGCP: [], specHeat300: [],
+    specHeat: [{ id: 'temperature', label: 'Temperature'}],
+    satWaterP: [{ id: 'quality', label: 'Quality' }, { id: 'pressure', label: 'Pressure' }],
+    satWaterT: [{ id: 'quality', label: 'Quality' }, { id: 'temperature', label: 'Temperature' }],
+    superheatedH20: [{ id: 'temperature', label: 'Temperature' }, { id: 'pressure', label: 'Pressure' }],
+    compLiqWat: [{ id: 'temperature', label: 'Temperature' }, { id: 'pressure', label: 'Pressure' }],
+    satIceWat: [{ id: 'quality', label: 'Quality' }, { id: 'temperature', label: 'Temperature' }],
+    satR134T: [{ id: 'quality', label: 'Quality' }, { id: 'temperature', label: 'Temperature' }],
+    satR134P: [{ id: 'quality', label: 'Quality' }, { id: 'pressure', label: 'Pressure' }],
+    superheatedR134: [{ id: 'temperature', label: 'Temperature' }, { id: 'pressure', label: 'Pressure' }],
+    idealAir: [{ id: 'temperature', label: 'Temperature' }],
+    idealN2: [{ id: 'temperature', label: 'Temperature' }],
+    idealO2: [{ id: 'temperature', label: 'Temperature' }],
+    idealCO2: [{ id: 'temperature', label: 'Temperature' }],
+    idealCO: [{ id: 'temperature', label: 'Temperature' }],
+    idealH2: [{ id: 'temperature', label: 'Temperature' }],
+    idealH2O: [{ id: 'temperature', label: 'Temperature' }],
+    idealO: [{ id: 'temperature', label: 'Temperature' }],
   };
+
+  // 🟢 NEW: Calculation request function
+  async function calculate() {
+  const payload = {
+    fluidType: selectedFluid,
+    substance: selectedSubstance,
+    inputs: inputValues
+  };
+
+  console.log(payload); // debug
+
+  try {
+    const response = await fetch('http://localhost:8000/api/calculate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) throw new Error('Server error');
+
+    const result = await response.json();
+    resultMessage = result.result;
+
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      resultMessage = `Error: ${error.message}`;
+    } else {
+      resultMessage = 'An unknown error occurred';
+    }
+  }
+}
+
 </script>
 
+<!-- Your original dropdown -->
 <label for="fluidDropdown">Calculate for:</label>
 <select id="fluidDropdown" bind:value={selectedFluid}>
   <option value="">-- Select --</option>
@@ -169,6 +157,7 @@ const specHeat = [
   <option value="idealO">Ideal-Gas Properties of Monatomic Oxygen (O)</option>
 </select>
 
+<!-- Fluid-specific dropdowns and inputs -->
 {#if selectedFluid === 'molGCP'}
   <div style="margin-top: 10px;">
     <label for="substanceDropdown">Select Gas:</label>
@@ -179,6 +168,7 @@ const specHeat = [
       {/each}
     </select>
   </div>
+
 {:else if selectedFluid === 'specHeat300'}
   <div style="margin-top: 10px;">
     <label for="substanceDropdown">Select Gas:</label>
@@ -189,9 +179,9 @@ const specHeat = [
       {/each}
     </select>
   </div>
-  {:else if selectedFluid === 'specHeat'}
+
+{:else if selectedFluid === 'specHeat'}
   <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
-    <!-- Gas selection dropdown -->
     <div>
       <label for="specHeatGas">Select Gas:</label>
       <select id="specHeatGas" bind:value={selectedSubstance}>
@@ -202,22 +192,32 @@ const specHeat = [
       </select>
     </div>
     <div>
-      <label for="specHeatTemp">Temperature (K):</label>
-      <input 
-        id="specHeatTemp" 
-        type="number" 
-        min="250" 
-        max="1000" 
-        placeholder="250-1000 K"
-      />
+      <label for="temperature">Temperature (K):</label>
+      <input id="temperature" type="number" min="250" max="1000" placeholder="250-1000 K" bind:value={inputValues.temperature} />
     </div>
   </div>
+
 {:else if selectedFluid && fluidInputs[selectedFluid]}
-  <!-- This shows inputs for other fluid types -->
   <div style="margin-top: 10px;">
     {#each fluidInputs[selectedFluid] as input}
       <label for={input.id}>{input.label}:</label>
-      <input id={input.id} type="text" />
+      <input id={input.id} type="text" bind:value={inputValues[input.id]} />
     {/each}
   </div>
 {/if}
+
+<!-- 🟢 Calculate button -->
+{#if selectedFluid}
+  <div style="margin-top: 20px;">
+    <button on:click={calculate}>Calculate</button>
+  </div>
+{/if}
+
+<!-- 🟢 Result display -->
+{#if resultMessage}
+  <div style="margin-top: 20px;">
+    <strong>Result:</strong>
+    <p>{resultMessage}</p>
+  </div>
+{/if}
+
