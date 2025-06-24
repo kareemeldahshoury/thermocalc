@@ -72,12 +72,11 @@ const specHeat = [
   let selectedFluid: FluidType | '' = '';
   let selectedSubstance = '';
 
-  // 🟢 NEW: Object to store user-entered input values
+
   let inputValues: Record<string, string> = {};
 
-  // 🟢 NEW: Result message display
+ 
   let resultMessage = '';
-  let calculationResult = "";
 
   const fluidInputs: Record<FluidType, Array<{id: string, label: string}>> = {
     molGCP: [], specHeat300: [],
@@ -100,7 +99,7 @@ const specHeat = [
     idealO: [{ id: 'temperature', label: 'Temperature' }],
   };
 
-  // 🟢 NEW: Calculation request function
+ 
   async function calculate() {
   const payload = {
     fluidType: selectedFluid,
@@ -108,31 +107,32 @@ const specHeat = [
     inputs: inputValues
   };
 
-  console.log("payload: ", payload); // debug
+  console.log(payload); 
 
   try {
     const response = await fetch('http://localhost:8000/api/calculate/satwater', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify( payload )
+      body: JSON.stringify(payload)
     });
 
-    if (!response.ok) {
-      throw new Error('Server error');
-    }
+    if (!response.ok) throw new Error('Server error');
 
     const result = await response.json();
-    calculationResult = result.result;
-    console.log("result: ", calculationResult)
+    resultMessage = result.result;
 
-  } catch (error) {
-    console.error("Failed to calculate");
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      resultMessage = `Error: ${error.message}`;
+    } else {
+      resultMessage = 'An unknown error occurred';
+    }
   }
 }
 
 </script>
 
-<!-- Your original dropdown -->
+
 <label for="fluidDropdown">Calculate for:</label>
 <select id="fluidDropdown" bind:value={selectedFluid}>
   <option value="">-- Select --</option>
@@ -157,7 +157,7 @@ const specHeat = [
   <option value="idealO">Ideal-Gas Properties of Monatomic Oxygen (O)</option>
 </select>
 
-<!-- Fluid-specific dropdowns and inputs -->
+
 {#if selectedFluid === 'molGCP'}
   <div style="margin-top: 10px;">
     <label for="substanceDropdown">Select Gas:</label>
@@ -206,18 +206,25 @@ const specHeat = [
   </div>
 {/if}
 
-<!-- 🟢 Calculate button -->
+
 {#if selectedFluid}
   <div style="margin-top: 20px;">
     <button on:click={calculate}>Calculate</button>
   </div>
 {/if}
 
-<!-- 🟢 Result display -->
 {#if resultMessage}
   <div style="margin-top: 20px;">
     <strong>Result:</strong>
-    <p>{resultMessage}</p>
+    {#if typeof resultMessage === 'object'}
+      <div style="margin-left: 20px;">
+        {#each Object.entries(resultMessage) as [key, value]}
+          <p><strong>{key}:</strong> {value}</p>
+        {/each}
+      </div>
+    {:else}
+      <p>{resultMessage}</p>
+    {/if}
   </div>
 {/if}
 
