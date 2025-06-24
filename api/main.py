@@ -1,22 +1,22 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.models import CalculationRequest
-from backend.controller import handle_calculation
+from backend.models.calculationRequest import CalculationRequest
+from backend.controller.calculationController import handle_calculation_satwater
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173"], # Maybe switch back to port 5173
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.post("/api/calculate")
+@app.post("/api/calculate/satwater")
 def calculate(req: CalculationRequest):
     try:
-        result = handle_calculation(
+        result = handle_calculation_satwater(
             fluid_type=req.fluidType,
             substance=req.substance,
             inputs=req.inputs

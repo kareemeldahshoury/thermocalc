@@ -77,6 +77,7 @@ const specHeat = [
 
   // 🟢 NEW: Result message display
   let resultMessage = '';
+  let calculationResult = "";
 
   const fluidInputs: Record<FluidType, Array<{id: string, label: string}>> = {
     molGCP: [], specHeat300: [],
@@ -107,26 +108,25 @@ const specHeat = [
     inputs: inputValues
   };
 
-  console.log(payload); // debug
+  console.log("payload: ", payload); // debug
 
   try {
-    const response = await fetch('http://localhost:8000/api/calculate', {
+    const response = await fetch('http://localhost:8000/api/calculate/satwater', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify( payload )
     });
 
-    if (!response.ok) throw new Error('Server error');
+    if (!response.ok) {
+      throw new Error('Server error');
+    }
 
     const result = await response.json();
-    resultMessage = result.result;
+    calculationResult = result.result;
+    console.log("result: ", calculationResult)
 
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      resultMessage = `Error: ${error.message}`;
-    } else {
-      resultMessage = 'An unknown error occurred';
-    }
+  } catch (error) {
+    console.error("Failed to calculate");
   }
 }
 

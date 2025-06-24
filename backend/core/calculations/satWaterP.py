@@ -11,7 +11,7 @@ def interpolate(value1, value2, x1, x2, x):
     return value1 + (value2 - value1) * (x - x1) / (x2 - x1)
 
 class SatWaterPCalculation:
-    def __init__(self, substance: str, inputs: Dict[str, str]):
+    def __init__(self, inputs: Dict[str, str]):
         self.inputs = inputs
         self.pressure = float(inputs.get("pressure", 0))
         self.x_value = float(inputs.get("quality", 0))
@@ -49,11 +49,12 @@ class SatWaterPCalculation:
         h = hf + self.x_value * hfg
         s = sf + self.x_value * sfg
 
-        return (
-            f"At {self.pressure} bar and quality {self.x_value}:\n"
-            f"Saturation Temp = {temp_sat:.2f} °C\n"
-            f"Specific Volume (v) = {v:.6f} m³/kg\n"
-            f"Internal Energy (u) = {u:.2f} kJ/kg\n"
-            f"Enthalpy (h) = {h:.2f} kJ/kg\n"
-            f"Entropy (s) = {s:.4f} kJ/kg·K"
-        )
+        return {
+            "pressure": self.pressure,
+            "quality": self.x_value,
+            "saturation_temperature": round(temp_sat, 2),
+            "specific_volume": round(v, 6),
+            "internal_energy": round(u, 2),
+            "enthalpy": round(h, 2),
+            "entropy": round(s, 4),
+        }
