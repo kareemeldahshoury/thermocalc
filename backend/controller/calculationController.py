@@ -1,4 +1,6 @@
 from backend.service.satWaterService import sat_water
+from backend.service.superHeatedWaterService import sh_water
+
 
 # Handles the variables to send to the proper calculation file
 def handle_calculation_satwater(fluid_type: str, substance: str, inputs: dict):
@@ -7,3 +9,8 @@ def handle_calculation_satwater(fluid_type: str, substance: str, inputs: dict):
         return result
     else:
         return "Calculation not implemented yet."
+    
+def handle_calculation_superHeatedWater(fluid_type: str, substance: str, inputs: dict):
+    result = sh_water(fluid_type, inputs)
+    return result
+    
