@@ -161,6 +161,6 @@ class IdealAirProperties:
             "enthalpy (h)": round(h, 2),
             "relative_pressure (Pr)": round(Pr, 4),
             "internal_energy (u)": round(u, 2),
-            "specific_volume (vr)": round(vr, 1),
+            "specific_volume (vr)": round(vr, 3),
             "entropy (s°)": round(s, 5),
         }

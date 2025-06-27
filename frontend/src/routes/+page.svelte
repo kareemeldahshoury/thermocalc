@@ -117,6 +117,8 @@ const specHeat = [
       endpoint = 'http://localhost:8000/api/calculate/superHeatedWater';
     } else if (selectedFluid === 'idealAir') {
   endpoint = 'http://localhost:8000/api/calculate/idealAir';  // ADD THIS
+    } else if (selectedFluid === 'idealN2') {
+  endpoint = 'http://localhost:8000/api/calculate/idealN2';  // ADD THIS
     }
 
     const response = await fetch(endpoint, {
