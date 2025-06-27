@@ -121,6 +121,8 @@ const specHeat = [
   endpoint = 'http://localhost:8000/api/calculate/idealN2';  // ADD THIS
     } else if (selectedFluid === 'idealO2') {
   endpoint = 'http://localhost:8000/api/calculate/idealO2';  // ADD THIS
+    } else if (selectedFluid === 'idealCO2') {
+  endpoint = 'http://localhost:8000/api/calculate/idealCO2';  // ADD THIS
     }
 
     const response = await fetch(endpoint, {

@@ -1,6 +1,6 @@
 from typing import Dict
 
-# Ideal oxygen properties: Temperature (K) -> [h (kJ/kmol), u (kJ/kmol), s° (kJ/kmol·K)]
+
 o2_data = {
     220: [6404, 4575, 196.171],
     230: [6694, 4782, 197.461],

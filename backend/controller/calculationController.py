@@ -3,6 +3,7 @@ from backend.service.superHeatedWaterService import sh_water
 from backend.service.idealAirService import idealAirCalculation
 from backend.service.idealN2Service import idealN2Calculation
 from backend.service.idealO2Service import idealO2Calculation
+from backend.service.idealCO2Service import idealCO2Calculation
 
 
 
@@ -28,4 +29,8 @@ def handle_calculation_N2(fluid_type: str, substance: str, inputs: dict):
 
 def handle_calculation_O2(fluid_type: str, substance: str, inputs: dict):
     result = idealO2Calculation(fluid_type, inputs)
+    return result
+
+def handle_calculation_CO2(fluid_type: str, substance: str, inputs: dict):
+    result = idealCO2Calculation(fluid_type, inputs)
     return result
