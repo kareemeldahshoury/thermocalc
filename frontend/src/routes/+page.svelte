@@ -1,7 +1,7 @@
 <script lang="ts">
   // Your original FluidType and data arrays
   type FluidType = 'satWaterP' | 'satWaterT' | 'superheatedH20' | 'compLiqWat' | 'satIceWat' | 'satR134T' | 'satR134P' | 'superheatedR134' | 'idealAir' | 'idealN2' | 'idealO2'
-  | 'idealCO2' | 'idealCO' | 'idealH2' | 'idealH2O' | 'idealO' | 'molGCP' | 'specHeat300' | 'specHeat';
+  | 'idealCO2' | 'idealCO' | 'idealH2' | 'idealH2O' | 'idealO' | 'molGCP' | 'specHeat300' | 'specHeat' | 'idealOH';
 
   const molGCPSubstances = [
   { id: 'air', name: 'Air' },
@@ -97,6 +97,7 @@ const specHeat = [
     idealH2: [{ id: 'temperature', label: 'Temperature' }],
     idealH2O: [{ id: 'temperature', label: 'Temperature' }],
     idealO: [{ id: 'temperature', label: 'Temperature' }],
+    idealOH: [{ id: 'temperature', label: 'Temperature' }]
   };
 
  
@@ -131,6 +132,8 @@ const specHeat = [
   endpoint = 'http://localhost:8000/api/calculate/idealH2O';  // ADD THIS
     } else if (selectedFluid === 'idealO') {
   endpoint = 'http://localhost:8000/api/calculate/idealO';  // ADD THIS
+    } else if (selectedFluid === 'idealOH') {
+  endpoint = 'http://localhost:8000/api/calculate/idealOH';  // ADD THIS
     }
 
 
@@ -181,6 +184,7 @@ const specHeat = [
   <option value="idealH2">Ideal-Gas Properties of Hydrogen (H₂)</option>
   <option value="idealH2O">Ideal-Gas Properties of Water Vapor (H₂O)</option>
   <option value="idealO">Ideal-Gas Properties of Monatomic Oxygen (O)</option>
+  <option value="idealOH">Ideal-Gas Properties of Hydroxyl (OH)</option>
 </select>
 
 

@@ -8,6 +8,7 @@ from backend.service.idealCOService import idealCOCalculation
 from backend.service.idealH2Service import idealH2Calculation
 from backend.service.idealH2OService import idealH2OCalculation
 from backend.service.idealOService import idealOCalculation
+from backend.service.idealOHService import idealOHCalculation
 
 
 # Handles the variables to send to the proper calculation file
@@ -53,4 +54,9 @@ def handle_calculation_H2O(fluid_type: str, substance: str, inputs: dict):
 def handle_calculation_O(fluid_type: str, substance: str, inputs: dict):
     result = idealOCalculation(fluid_type, inputs)
     return result
+
+def handle_calculation_OH(fluid_type: str, substance: str, inputs: dict):
+    result = idealOHCalculation(fluid_type, inputs)
+    return result
+
 
