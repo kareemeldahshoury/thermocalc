@@ -9,6 +9,7 @@ from backend.service.idealH2Service import idealH2Calculation
 from backend.service.idealH2OService import idealH2OCalculation
 from backend.service.idealOService import idealOCalculation
 from backend.service.idealOHService import idealOHCalculation
+from backend.service.satR134Service import sat_r134
 
 
 # Handles the variables to send to the proper calculation file
@@ -59,4 +60,9 @@ def handle_calculation_OH(fluid_type: str, substance: str, inputs: dict):
     result = idealOHCalculation(fluid_type, inputs)
     return result
 
-
+def handle_calculation_satR134(fluid_type: str, substance: str, inputs: dict):
+    if "satR134" in fluid_type:
+        result = sat_r134(fluid_type, inputs)
+        return result
+    else:
+        return "Calculation not implemented yet."

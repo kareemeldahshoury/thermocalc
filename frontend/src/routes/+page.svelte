@@ -134,7 +134,10 @@ const specHeat = [
   endpoint = 'http://localhost:8000/api/calculate/idealO';  // ADD THIS
     } else if (selectedFluid === 'idealOH') {
   endpoint = 'http://localhost:8000/api/calculate/idealOH';  // ADD THIS
+    } else if (selectedFluid.includes('satR134')) {
+      endpoint = 'http://localhost:8000/api/calculate/satR134';
     }
+
 
 
     const response = await fetch(endpoint, {
