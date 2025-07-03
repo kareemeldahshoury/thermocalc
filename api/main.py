@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.models.calculationRequest import CalculationRequest
 from backend.controller.calculationController import ( handle_calculation_satwater, handle_calculation_superHeatedWater, handle_calculation_idealAir, handle_calculation_N2, handle_calculation_O2,
-handle_calculation_CO2, handle_calculation_CO, handle_calculation_H2, handle_calculation_H2O, handle_calculation_O, handle_calculation_OH, handle_calculation_satR134)
+handle_calculation_CO2, handle_calculation_CO, handle_calculation_H2, handle_calculation_H2O, handle_calculation_O, handle_calculation_OH, handle_calculation_satR134, handle_calculation_satIceWat)
 
 app = FastAPI()
 
@@ -160,6 +160,20 @@ def calculate_idealO(req: CalculationRequest):
 def calculate_idealOH(req: CalculationRequest):
     try:
         result = handle_calculation_OH(
+            fluid_type=req.fluidType,
+            substance=req.substance,
+            inputs=req.inputs
+        )
+        return {"result": result}
+    except ValueError as e:
+        return {"result": f"Error: {str(e)}"}
+    except Exception as e:
+        return {"result": f"Unexpected error: {str(e)}"}
+    
+@app.post("/api/calculate/satIceWat")
+def calculate_satIceWat(req: CalculationRequest):
+    try:
+        result = handle_calculation_satIceWat(
             fluid_type=req.fluidType,
             substance=req.substance,
             inputs=req.inputs

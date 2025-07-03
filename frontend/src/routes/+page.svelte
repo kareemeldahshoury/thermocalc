@@ -135,8 +135,10 @@ const specHeat = [
     } else if (selectedFluid === 'idealOH') {
   endpoint = 'http://localhost:8000/api/calculate/idealOH';  // ADD THIS
     } else if (selectedFluid.includes('satR134')) {
-      endpoint = 'http://localhost:8000/api/calculate/satR134';
-    }
+  endpoint = 'http://localhost:8000/api/calculate/satR134';
+    } else if (selectedFluid === 'satIceWat') {
+  endpoint = 'http://localhost:8000/api/calculate/satIceWat';  // ADD THIS
+    } 
 
 
 

@@ -10,6 +10,7 @@ from backend.service.idealH2OService import idealH2OCalculation
 from backend.service.idealOService import idealOCalculation
 from backend.service.idealOHService import idealOHCalculation
 from backend.service.satR134Service import sat_r134
+from backend.service.satIceWatService import satIceWatCalculation
 
 
 # Handles the variables to send to the proper calculation file
@@ -66,3 +67,7 @@ def handle_calculation_satR134(fluid_type: str, substance: str, inputs: dict):
         return result
     else:
         return "Calculation not implemented yet."
+    
+def handle_calculation_satIceWat(fluid_type: str, substance: str, inputs: dict):
+    result = satIceWatCalculation(fluid_type, inputs)
+    return result
