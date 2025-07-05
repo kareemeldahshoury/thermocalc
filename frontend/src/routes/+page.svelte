@@ -140,7 +140,12 @@ const specHeat = [
   endpoint = 'http://localhost:8000/api/calculate/satIceWat';  // ADD THIS
     } else if (selectedFluid === 'superheatedR134') {
   endpoint = 'http://localhost:8000/api/calculate/superheatedR134';  // ADD THIS
+    } else if (selectedFluid === 'molGCP') {
+  endpoint = 'http://localhost:8000/api/calculate/molGCP';  // ADD THIS
+    } else if (selectedFluid === 'specHeat300') {
+  endpoint = 'http://localhost:8000/api/calculate/specHeat300';  // ADD THIS
     } 
+
 
 
 

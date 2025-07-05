@@ -12,7 +12,8 @@ from backend.service.idealOHService import idealOHCalculation
 from backend.service.satR134Service import sat_r134
 from backend.service.satIceWatService import satIceWatCalculation
 from backend.service.superheatedR134Service import sh_134a
-
+from backend.core.calculations.molGCP import molGCPCalculation
+from backend.core.calculations.specHeat300 import idealGas300KCalculation
 
 # Handles the variables to send to the proper calculation file
 def handle_calculation_satwater(fluid_type: str, substance: str, inputs: dict):
@@ -75,4 +76,12 @@ def handle_calculation_satIceWat(fluid_type: str, substance: str, inputs: dict):
 
 def handle_calculation_superheated134(fluid_type: str, substance: str, inputs: dict):
     result = sh_134a(fluid_type, inputs)
+    return result
+
+def handle_calculation_molGCP(fluid_type: str, substance: str):
+    result = molGCPCalculation(substance)
+    return result
+
+def handle_calculation_specHeat300(fluid_type: str, substance: str):
+    result = idealGas300KCalculation(substance)
     return result

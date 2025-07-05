@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.models.calculationRequest import CalculationRequest
 from backend.controller.calculationController import ( handle_calculation_satwater, handle_calculation_superHeatedWater, handle_calculation_idealAir, handle_calculation_N2, handle_calculation_O2,
 handle_calculation_CO2, handle_calculation_CO, handle_calculation_H2, handle_calculation_H2O, handle_calculation_O, handle_calculation_OH, handle_calculation_satR134, handle_calculation_satIceWat,
-handle_calculation_superheated134)
+handle_calculation_superheated134, handle_calculation_molGCP, handle_calculation_specHeat300)
 
 app = FastAPI()
 
@@ -207,6 +207,33 @@ def calculate_sat134(req: CalculationRequest):
             fluid_type=req.fluidType,
             substance=req.substance,
             inputs=req.inputs
+        )
+        return {"result": result}
+    except ValueError as e:
+        return {"result": f"Error: {str(e)}"}
+    except Exception as e:
+        return {"result": f"Unexpected error: {str(e)}"}
+    
+
+@app.post("/api/calculate/molGCP")
+def calculate_molGCP(req: CalculationRequest):
+    try:
+        result = handle_calculation_molGCP(
+            fluid_type=req.fluidType,
+            substance=req.substance
+        )
+        return {"result": result}
+    except ValueError as e:
+        return {"result": f"Error: {str(e)}"}
+    except Exception as e:
+        return {"result": f"Unexpected error: {str(e)}"}
+    
+@app.post("/api/calculate/specHeat300")
+def calculate_specHEat300(req: CalculationRequest):
+    try:
+        result = handle_calculation_specHeat300(
+            fluid_type=req.fluidType,
+            substance=req.substance
         )
         return {"result": result}
     except ValueError as e:
