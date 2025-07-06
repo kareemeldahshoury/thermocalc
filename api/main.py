@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.models.calculationRequest import CalculationRequest
 from backend.controller.calculationController import ( handle_calculation_satwater, handle_calculation_superHeatedWater, handle_calculation_idealAir, handle_calculation_N2, handle_calculation_O2,
 handle_calculation_CO2, handle_calculation_CO, handle_calculation_H2, handle_calculation_H2O, handle_calculation_O, handle_calculation_OH, handle_calculation_satR134, handle_calculation_satIceWat,
-handle_calculation_superheated134, handle_calculation_molGCP, handle_calculation_specHeat300)
+handle_calculation_superheated134, handle_calculation_molGCP, handle_calculation_specHeat300, handle_calculation_specHeat)
 
 app = FastAPI()
 
@@ -229,7 +229,7 @@ def calculate_molGCP(req: CalculationRequest):
         return {"result": f"Unexpected error: {str(e)}"}
     
 @app.post("/api/calculate/specHeat300")
-def calculate_specHEat300(req: CalculationRequest):
+def calculate_specHeat300(req: CalculationRequest):
     try:
         result = handle_calculation_specHeat300(
             fluid_type=req.fluidType,
@@ -240,3 +240,22 @@ def calculate_specHEat300(req: CalculationRequest):
         return {"result": f"Error: {str(e)}"}
     except Exception as e:
         return {"result": f"Unexpected error: {str(e)}"}
+
+@app.post("/api/calculate/specHeat")
+def calculate_specHeat(req: CalculationRequest):
+    try:
+        # Optionally validate temperature exists
+        if "temperature" not in req.inputs:
+            raise ValueError("Temperature is required for specHeat calculation.")
+        
+        result = handle_calculation_specHeat(
+            fluid_type=req.fluidType,
+            substance=req.substance,
+            inputs=req.inputs
+        )
+        return {"result": result}
+    except ValueError as e:
+        return {"result": f"Error: {str(e)}"}
+    except Exception as e:
+        return {"result": f"Unexpected error: {str(e)}"}
+

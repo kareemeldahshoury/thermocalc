@@ -144,6 +144,8 @@ const specHeat = [
   endpoint = 'http://localhost:8000/api/calculate/molGCP';  // ADD THIS
     } else if (selectedFluid === 'specHeat300') {
   endpoint = 'http://localhost:8000/api/calculate/specHeat300';  // ADD THIS
+    } else if (selectedFluid === 'specHeat') {
+  endpoint = 'http://localhost:8000/api/calculate/specHeat';  // ADD THIS
     } 
 
 
