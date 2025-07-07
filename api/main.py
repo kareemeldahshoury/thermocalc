@@ -1,9 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.models.calculationRequest import CalculationRequest
-from backend.controller.calculationController import ( handle_calculation_satwater, handle_calculation_superHeatedWater, handle_calculation_idealAir, handle_calculation_N2, handle_calculation_O2,
-handle_calculation_CO2, handle_calculation_CO, handle_calculation_H2, handle_calculation_H2O, handle_calculation_O, handle_calculation_OH, handle_calculation_satR134, handle_calculation_satIceWat,
-handle_calculation_superheated134, handle_calculation_molGCP, handle_calculation_specHeat300, handle_calculation_specHeat)
+from backend.controller.calculationController import ( handle_calculation_satwater, handle_calculation_superHeatedWater, handle_calculation_idealAir, handle_calculation_satR134, handle_calculation_satIceWat,
+handle_calculation_superheated134, handle_calculation_molGCP, handle_calculation_specHeat300, handle_calculation_specHeat, handle_calculation_idealGas)
 
 app = FastAPI()
 
@@ -44,123 +43,10 @@ def calculate_superHeatedWater(req: CalculationRequest):
     except Exception as e:
         return {"result": f"Unexpected error: {str(e)}"}
     
-@app.post("/api/calculate/idealAir")
+@app.post("/api/calculate/airData")
 def calculate_idealAir(req: CalculationRequest):
     try:
         result = handle_calculation_idealAir(
-            fluid_type=req.fluidType,
-            substance=req.substance,
-            inputs=req.inputs
-        )
-        return {"result": result}
-    except ValueError as e:
-        return {"result": f"Error: {str(e)}"}
-    except Exception as e:
-        return {"result": f"Unexpected error: {str(e)}"}
-
-
-@app.post("/api/calculate/idealN2")
-def calculate_idealN2(req: CalculationRequest):
-    try:
-        result = handle_calculation_N2(
-            fluid_type=req.fluidType,
-            substance=req.substance,
-            inputs=req.inputs
-        )
-        return {"result": result}
-    except ValueError as e:
-        return {"result": f"Error: {str(e)}"}
-    except Exception as e:
-        return {"result": f"Unexpected error: {str(e)}"}
-    
-@app.post("/api/calculate/idealO2")
-def calculate_idealO2(req: CalculationRequest):
-    try:
-        result = handle_calculation_O2(
-            fluid_type=req.fluidType,
-            substance=req.substance,
-            inputs=req.inputs
-        )
-        return {"result": result}
-    except ValueError as e:
-        return {"result": f"Error: {str(e)}"}
-    except Exception as e:
-        return {"result": f"Unexpected error: {str(e)}"}
-    
-@app.post("/api/calculate/idealCO2")
-def calculate_idealCO2(req: CalculationRequest):
-    try:
-        result = handle_calculation_CO2(
-            fluid_type=req.fluidType,
-            substance=req.substance,
-            inputs=req.inputs
-        )
-        return {"result": result}
-    except ValueError as e:
-        return {"result": f"Error: {str(e)}"}
-    except Exception as e:
-        return {"result": f"Unexpected error: {str(e)}"}
-    
-@app.post("/api/calculate/idealCO")
-def calculate_idealCO(req: CalculationRequest):
-    try:
-        result = handle_calculation_CO(
-            fluid_type=req.fluidType,
-            substance=req.substance,
-            inputs=req.inputs
-        )
-        return {"result": result}
-    except ValueError as e:
-        return {"result": f"Error: {str(e)}"}
-    except Exception as e:
-        return {"result": f"Unexpected error: {str(e)}"}
-
-@app.post("/api/calculate/idealH2")
-def calculate_idealH2(req: CalculationRequest):
-    try:
-        result = handle_calculation_H2(
-            fluid_type=req.fluidType,
-            substance=req.substance,
-            inputs=req.inputs
-        )
-        return {"result": result}
-    except ValueError as e:
-        return {"result": f"Error: {str(e)}"}
-    except Exception as e:
-        return {"result": f"Unexpected error: {str(e)}"}
-
-@app.post("/api/calculate/idealH2O")
-def calculate_idealH2O(req: CalculationRequest):
-    try:
-        result = handle_calculation_H2O(
-            fluid_type=req.fluidType,
-            substance=req.substance,
-            inputs=req.inputs
-        )
-        return {"result": result}
-    except ValueError as e:
-        return {"result": f"Error: {str(e)}"}
-    except Exception as e:
-        return {"result": f"Unexpected error: {str(e)}"}
-    
-@app.post("/api/calculate/idealO")
-def calculate_idealO(req: CalculationRequest):
-    try:
-        result = handle_calculation_O(
-            fluid_type=req.fluidType,
-            substance=req.substance,
-            inputs=req.inputs
-        )
-        return {"result": result}
-    except ValueError as e:
-        return {"result": f"Error: {str(e)}"}
-    except Exception as e:
-        return {"result": f"Unexpected error: {str(e)}"}
-
-@app.post("/api/calculate/idealOH")
-def calculate_idealOH(req: CalculationRequest):
-    try:
-        result = handle_calculation_OH(
             fluid_type=req.fluidType,
             substance=req.substance,
             inputs=req.inputs
@@ -259,3 +145,19 @@ def calculate_specHeat(req: CalculationRequest):
     except Exception as e:
         return {"result": f"Unexpected error: {str(e)}"}
 
+@app.post("/api/calculate/idealGas")
+def calculate_idealGas(req: CalculationRequest):
+    try:
+        if "temperature" not in req.inputs:
+            raise ValueError("Temperature is required.")
+
+        result = handle_calculation_idealGas(
+            fluid_type=req.fluidType,
+            substance=req.substance,
+            inputs=req.inputs
+        )
+        return {"result": result}
+    except ValueError as e:
+        return {"result": f"Error: {str(e)}"}
+    except Exception as e:
+        return {"result": f"Unexpected error: {str(e)}"}

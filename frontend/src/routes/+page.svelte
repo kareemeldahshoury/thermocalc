@@ -1,6 +1,6 @@
 <script lang="ts">
   // Your original FluidType and data arrays
-  type FluidType = 'satWaterP' | 'satWaterT' | 'superheatedH20' | 'compLiqWat' | 'satIceWat' | 'satR134T' | 'satR134P' | 'superheatedR134' | 'idealAir' | 'idealN2' | 'idealO2'
+  type FluidType = 'satWaterP' | 'satWaterT' | 'superheatedH20' | 'compLiqWat' | 'satIceWat' | 'satR134T' | 'satR134P' | 'superheatedR134' | 'airData' | 'idealN2' | 'idealO2'
   | 'idealCO2' | 'idealCO' | 'idealH2' | 'idealH2O' | 'idealO' | 'molGCP' | 'specHeat300' | 'specHeat' | 'idealOH';
 
   const molGCPSubstances = [
@@ -78,6 +78,10 @@ const specHeat = [
  
   let resultMessage = '';
 
+    $: if (selectedFluid.startsWith('ideal')) {
+    selectedSubstance = selectedFluid.replace('ideal', '').toLowerCase();
+  }
+
   const fluidInputs: Record<FluidType, Array<{id: string, label: string}>> = {
     molGCP: [], specHeat300: [],
     specHeat: [{ id: 'temperature', label: 'Temperature'}],
@@ -89,7 +93,7 @@ const specHeat = [
     satR134T: [{ id: 'quality', label: 'Quality' }, { id: 'temperature', label: 'Temperature' }],
     satR134P: [{ id: 'quality', label: 'Quality' }, { id: 'pressure', label: 'Pressure' }],
     superheatedR134: [{ id: 'temperature', label: 'Temperature' }, { id: 'pressure', label: 'Pressure' }],
-    idealAir: [{ id: 'temperature', label: 'Temperature' }],
+    airData: [{ id: 'temperature', label: 'Temperature' }],
     idealN2: [{ id: 'temperature', label: 'Temperature' }],
     idealO2: [{ id: 'temperature', label: 'Temperature' }],
     idealCO2: [{ id: 'temperature', label: 'Temperature' }],
@@ -116,24 +120,8 @@ const specHeat = [
       endpoint = 'http://localhost:8000/api/calculate/satwater';
     } else if (selectedFluid === 'superheatedH20') {
       endpoint = 'http://localhost:8000/api/calculate/superHeatedWater';
-    } else if (selectedFluid === 'idealAir') {
-  endpoint = 'http://localhost:8000/api/calculate/idealAir';  // ADD THIS
-    } else if (selectedFluid === 'idealN2') {
-  endpoint = 'http://localhost:8000/api/calculate/idealN2';  // ADD THIS
-    } else if (selectedFluid === 'idealO2') {
-  endpoint = 'http://localhost:8000/api/calculate/idealO2';  // ADD THIS
-    } else if (selectedFluid === 'idealCO2') {
-  endpoint = 'http://localhost:8000/api/calculate/idealCO2';  // ADD THIS
-    } else if (selectedFluid === 'idealCO') {
-  endpoint = 'http://localhost:8000/api/calculate/idealCO';  // ADD THIS
-    } else if (selectedFluid === 'idealH2') {
-  endpoint = 'http://localhost:8000/api/calculate/idealH2';  // ADD THIS
-    } else if (selectedFluid === 'idealH2O') {
-  endpoint = 'http://localhost:8000/api/calculate/idealH2O';  // ADD THIS
-    } else if (selectedFluid === 'idealO') {
-  endpoint = 'http://localhost:8000/api/calculate/idealO';  // ADD THIS
-    } else if (selectedFluid === 'idealOH') {
-  endpoint = 'http://localhost:8000/api/calculate/idealOH';  // ADD THIS
+    } else if (selectedFluid === 'airData') {
+  endpoint = 'http://localhost:8000/api/calculate/airData';  // ADD THIS  // ADD THIS
     } else if (selectedFluid.includes('satR134')) {
   endpoint = 'http://localhost:8000/api/calculate/satR134';
     } else if (selectedFluid === 'satIceWat') {
@@ -146,8 +134,9 @@ const specHeat = [
   endpoint = 'http://localhost:8000/api/calculate/specHeat300';  // ADD THIS
     } else if (selectedFluid === 'specHeat') {
   endpoint = 'http://localhost:8000/api/calculate/specHeat';  // ADD THIS
-    } 
-
+    } else if (selectedFluid.includes('ideal')) {
+  endpoint = 'http://localhost:8000/api/calculate/idealGas';
+    }
 
 
 
@@ -190,7 +179,7 @@ const specHeat = [
   <option value="satR134T">Saturated Refrigerant-134a (Temperature)</option>
   <option value="satR134P">Saturated Refrigerant-134a (Pressure)</option>
   <option value="superheatedR134">Superheated Refrigerant-134a</option>
-  <option value="idealAir">Ideal-Gas Properties of Air</option>
+  <option value="airData">Ideal-Gas Properties of Air</option>
   <option value="idealN2">Ideal-Gas Properties of Nitrogen (N₂)</option>
   <option value="idealO2">Ideal-Gas Properties of Oxygen (O₂)</option>
   <option value="idealCO2">Ideal-Gas Properties of Carbon Dioxide (CO₂)</option>
@@ -240,6 +229,21 @@ const specHeat = [
       <input id="temperature" type="number" min="250" max="1000" placeholder="250-1000 K" bind:value={inputValues.temperature} />
     </div>
   </div>
+{:else if selectedFluid.startsWith('ideal')}
+  <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+    <div>
+      <label for="temperature">Temperature (K):</label>
+      <input
+        id="temperature"
+        type="number"
+        min="250"
+        max="1000"
+        placeholder="Enter temperature (250–1000 K)"
+        bind:value={inputValues.temperature}
+      />
+    </div>
+  </div>
+
 
 {:else if selectedFluid && fluidInputs[selectedFluid]}
   <div style="margin-top: 10px;">
