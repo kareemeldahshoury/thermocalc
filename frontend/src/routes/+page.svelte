@@ -1,6 +1,6 @@
 <script lang="ts">
-  // Your original FluidType and data arrays
-  type FluidType = 'satWaterP' | 'satWaterT' | 'superheatedH20' | 'compLiqWat' | 'satIceWat' | 'satR134T' | 'satR134P' | 'superheatedR134' | 'airData' | 'idealN2' | 'idealO2'
+
+  type FluidType = 'pressureSatWater' | 'temperatureSatWater' | 'superheatedH20' | 'compLiqWat' | 'SatIceWat' | 'temperatureSatR134' | 'pressureSatR134' | 'superheatedR134' | 'airData' | 'idealN2' | 'idealO2'
   | 'idealCO2' | 'idealCO' | 'idealH2' | 'idealH2O' | 'idealO' | 'molGCP' | 'specHeat300' | 'specHeat' | 'idealOH';
 
   const molGCPSubstances = [
@@ -71,7 +71,14 @@ const specHeat = [
 
   let selectedFluid: FluidType | '' = '';
   let selectedSubstance = '';
-
+  let previousFluid = '';
+$: if (selectedFluid !== previousFluid) {
+  inputValues = {}; // clear old values like temperature/pressure when switching
+  if (!selectedFluid.startsWith('ideal') && selectedFluid !== 'specHeat') {
+    selectedSubstance = '';
+  }
+  previousFluid = selectedFluid;
+}
 
   let inputValues: Record<string, string> = {};
 
@@ -85,13 +92,13 @@ const specHeat = [
   const fluidInputs: Record<FluidType, Array<{id: string, label: string}>> = {
     molGCP: [], specHeat300: [],
     specHeat: [{ id: 'temperature', label: 'Temperature'}],
-    satWaterP: [{ id: 'quality', label: 'Quality' }, { id: 'pressure', label: 'Pressure' }],
-    satWaterT: [{ id: 'quality', label: 'Quality' }, { id: 'temperature', label: 'Temperature' }],
+    pressureSatWater: [{ id: 'quality', label: 'Quality' }, { id: 'pressure', label: 'Pressure' }],
+    temperatureSatWater: [{ id: 'quality', label: 'Quality' }, { id: 'temperature', label: 'Temperature' }],
     superheatedH20: [{ id: 'temperature', label: 'Temperature' }, { id: 'pressure', label: 'Pressure' }],
     compLiqWat: [{ id: 'temperature', label: 'Temperature' }, { id: 'pressure', label: 'Pressure' }],
-    satIceWat: [{ id: 'quality', label: 'Quality' }, { id: 'temperature', label: 'Temperature' }],
-    satR134T: [{ id: 'quality', label: 'Quality' }, { id: 'temperature', label: 'Temperature' }],
-    satR134P: [{ id: 'quality', label: 'Quality' }, { id: 'pressure', label: 'Pressure' }],
+    SatIceWat: [{ id: 'quality', label: 'Quality' }, { id: 'temperature', label: 'Temperature' }],
+    temperatureSatR134: [{ id: 'quality', label: 'Quality' }, { id: 'temperature', label: 'Temperature' }],
+    pressureSatR134: [{ id: 'quality', label: 'Quality' }, { id: 'pressure', label: 'Pressure' }],
     superheatedR134: [{ id: 'temperature', label: 'Temperature' }, { id: 'pressure', label: 'Pressure' }],
     airData: [{ id: 'temperature', label: 'Temperature' }],
     idealN2: [{ id: 'temperature', label: 'Temperature' }],
@@ -115,36 +122,47 @@ const specHeat = [
   console.log(payload); 
 
   try {
-    let endpoint = '';
-    if (selectedFluid.includes('satWater')) {
-      endpoint = 'http://localhost:8000/api/calculate/satwater';
-    } else if (selectedFluid === 'superheatedH20') {
-      endpoint = 'http://localhost:8000/api/calculate/superHeatedWater';
-    } else if (selectedFluid === 'airData') {
-  endpoint = 'http://localhost:8000/api/calculate/airData';  // ADD THIS  // ADD THIS
-    } else if (selectedFluid.includes('satR134')) {
-  endpoint = 'http://localhost:8000/api/calculate/satR134';
-    } else if (selectedFluid === 'satIceWat') {
-  endpoint = 'http://localhost:8000/api/calculate/satIceWat';  // ADD THIS
-    } else if (selectedFluid === 'superheatedR134') {
-  endpoint = 'http://localhost:8000/api/calculate/superheatedR134';  // ADD THIS
-    } else if (selectedFluid === 'molGCP') {
-  endpoint = 'http://localhost:8000/api/calculate/molGCP';  // ADD THIS
-    } else if (selectedFluid === 'specHeat300') {
-  endpoint = 'http://localhost:8000/api/calculate/specHeat300';  // ADD THIS
-    } else if (selectedFluid === 'specHeat') {
-  endpoint = 'http://localhost:8000/api/calculate/specHeat';  // ADD THIS
-    } else if (selectedFluid.includes('ideal')) {
+let endpoint = '';
+
+if (selectedFluid.includes('Sat')) {
+  endpoint = 'http://localhost:8000/api/calculate/satFluid';
+} else if (selectedFluid === 'superheatedH20') {
+  endpoint = 'http://localhost:8000/api/calculate/superHeatedWater';
+} else if (selectedFluid === 'superheatedR134') {
+  endpoint = 'http://localhost:8000/api/calculate/superheatedR134';
+} else if (selectedFluid === 'airData') {
+  endpoint = 'http://localhost:8000/api/calculate/airData';
+} else if (selectedFluid === 'molGCP') {
+  endpoint = 'http://localhost:8000/api/calculate/molGCP';
+} else if (selectedFluid === 'specHeat300') {
+  endpoint = 'http://localhost:8000/api/calculate/specHeat300';
+} else if (selectedFluid === 'specHeat') {
+  endpoint = 'http://localhost:8000/api/calculate/specHeat';
+} else if (selectedFluid.startsWith('ideal')) {
   endpoint = 'http://localhost:8000/api/calculate/idealGas';
-    }
+}
+
+  const payload: any = {
+    fluidType: selectedFluid,
+    inputs: inputValues
+  };
+
+  // ✅ Add substance only when needed
+  if (
+    selectedFluid.includes('ideal') ||
+    selectedFluid === 'molGCP' ||
+    selectedFluid === 'specHeat300' ||
+    selectedFluid === 'specHeat'
+  ) {
+    payload.substance = selectedSubstance;
+  }
 
 
-
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+const response = await fetch(endpoint, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(payload)
+  });
 
   
 
@@ -171,13 +189,13 @@ const specHeat = [
   <option value="molGCP">Molar-Specific Gas Properties</option>
   <option value="specHeat300">Ideal Gas Specific Heat @ 300 K</option>
   <option value="specHeat">Ideal Gas Specific Heat (Temperature)</option>
-  <option value="satWaterP">Saturated Water (Pressure)</option>
-  <option value="satWaterT">Saturated Water (Temperature)</option>
+  <option value="pressureSatWater">Saturated Water (Pressure)</option>
+  <option value="temperatureSatWater">Saturated Water (Temperature)</option>
   <option value="superheatedH20">Superheated Water</option>
   <option value="compLiqWat">Compressed Liq. Water</option>
-  <option value="satIceWat">Saturated Ice-Water Vapor</option>
-  <option value="satR134T">Saturated Refrigerant-134a (Temperature)</option>
-  <option value="satR134P">Saturated Refrigerant-134a (Pressure)</option>
+  <option value="SatIceWat">Saturated Ice-Water Vapor</option>
+  <option value="temperatureSatR134">Saturated Refrigerant-134a (Temperature)</option>
+  <option value="pressureSatR134">Saturated Refrigerant-134a (Pressure)</option>
   <option value="superheatedR134">Superheated Refrigerant-134a</option>
   <option value="airData">Ideal-Gas Properties of Air</option>
   <option value="idealN2">Ideal-Gas Properties of Nitrogen (N₂)</option>
