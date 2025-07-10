@@ -512,7 +512,7 @@ const response = await fetch(endpoint, {
     border: 1px solid #ccc;
     margin-bottom: 16px;
     color: black;
-    background-color: #f0f4ff;
+    background-color: #f2f2f2;
   }
 
   button {
