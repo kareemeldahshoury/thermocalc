@@ -5,6 +5,12 @@ function formatLabel(label: string): string {
   return `${main}<br><span style="font-size: 0.8em;">${parens}</span>`;
 }
 
+function getFluidLabel(id: string): string {
+  const option = fluidOptions.find(opt => opt.id === id);
+  return option ? option.label : id;
+}
+
+
 function getPlaceholder(inputId: string, fluid: FluidType): string {
   if (inputId === 'quality') return 'Enter value between 0 and 1';
 
@@ -418,7 +424,25 @@ const response = await fetch(endpoint, {
 
 {#if resultMessage}
   <div style="margin-top: 20px;">
-    <strong>Result:</strong>
+<strong>
+  Result: {getFluidLabel(selectedFluid)}
+  {#if inputValues.temperature || inputValues.pressure || inputValues.quality}
+    &nbsp;(
+    {#if inputValues.temperature}
+      T = {inputValues.temperature} {selectedFluid.includes('ideal') ? 'K' : '°C'}{(inputValues.pressure || inputValues.quality) ? ', ' : ''}
+    {/if}
+    {#if inputValues.pressure}
+      P = {inputValues.pressure} bar{inputValues.quality ? ', ' : ''}
+    {/if}
+    {#if inputValues.quality}
+      x = {inputValues.quality}
+    {/if}
+    )
+  {/if}
+</strong>
+
+
+
 
     {#if typeof resultMessage === 'object' && resultMessage !== null}
       <table>
