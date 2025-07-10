@@ -44,11 +44,11 @@ def molGCPCalculation(substance: str) -> Dict[str, str | float]:
     
     formula, M, R, T_crit, P_crit, V_crit = molGCP_data[substance]
     return {
-        "Substance": substance.replace("_", " ").title(),
-        "Formula": formula,
-        "Molar Mass (kg/kmol)": M,
-        "Gas Constant R (kJ/kg·K)": R,
-        "Critical Temp (K)": T_crit,
-        "Critical Pressure (MPa)": P_crit,
-        "Critical Volume (m³/kmol)": V_crit
-    }
+    "Substance<br>": substance.replace("_", " ").title(),
+    "Formula<br>": formula,
+    "Molar Mass<br>(kg/kmol)": M,
+    "Gas Constant<br>R (kJ/kg·K)": R,
+    "Critical Temp<br>(Tₛ, K)": T_crit,
+    "Critical Pressure<br>(Pₛ, MPa)": P_crit,
+    "Critical Volume<br>(Vₛ, m³/kmol)": V_crit
+}

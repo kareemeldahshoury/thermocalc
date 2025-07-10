@@ -1,5 +1,95 @@
 <script lang="ts">
 
+function formatLabel(label: string): string {
+  const [main, parens] = label.split('<br>');
+  return `${main}<br><span style="font-size: 0.8em;">${parens}</span>`;
+}
+
+function getPlaceholder(inputId: string, fluid: FluidType): string {
+  if (inputId === 'quality') return 'Enter value between 0 and 1';
+
+  if (inputId === 'pressure') {
+    switch (fluid) {
+      case 'pressureSatWater':
+        return 'Enter a value from 0.01 to 220.64 bar';
+      case 'pressureSatR134':
+        return 'Enter a value from 0.06 to 40 bar';
+      case 'superheatedH20':
+        return 'Enter a value from 1 to 100 bar';
+      case 'superheatedR134':
+        return 'Enter a value from 0.06 to 40 bar';
+      case 'compLiqWat':
+        return 'Enter a value from 1 to 300 bar';
+      default:
+        return 'Enter pressure in bar';
+    }
+  }
+
+  if (inputId === 'temperature') {
+    switch (fluid) {
+      case 'temperatureSatWater':
+        return 'Enter a value from 0 to 373.95 °C';
+      case 'superheatedH20':
+        return 'Enter a value from 100 to 800 °C';
+      case 'superheatedR134':
+        return 'Enter a value from 20 to 160 °C';
+      case 'temperatureSatR134':
+        return 'Enter a value from -40 to 100 °C';
+      case 'compLiqWat':
+        return 'Enter a value from 0 to 300 °C';
+      case 'idealN2':
+        return 'Enter a value from 220 to 3250 K';
+      case 'idealO2':
+        return 'Enter a value from 220 to 3250 K';
+      case 'idealCO2':
+        return 'Enter a value from 220 to 3250 K';
+      case 'idealCO':
+        return 'Enter a value from 220 to 3250 K';
+      case 'idealH2':
+        return 'Enter a value from 260 to 3250 K';
+      case 'idealH2O':
+        return 'Enter a value from 220 to 3250 K';
+      case 'idealO':
+        return 'Enter a value from 298 to 3500 K';
+      case 'idealOH':
+        return 'Enter a value from 298 to 3500 K';
+      default:
+        return 'Enter temperature';
+    }
+  }
+
+  return '';
+}
+
+let searchText = '';
+
+type FluidOption = { id: FluidType; label: string };
+
+const fluidOptions: FluidOption[] = [
+  { id: 'airData', label: 'Ideal-Gas Properties of Air' },
+  { id: 'idealCO', label: 'Ideal-Gas Properties of Carbon Monoxide (CO)' },
+  { id: 'idealCO2', label: 'Ideal-Gas Properties of Carbon Dioxide (CO₂)' },
+  { id: 'idealH2', label: 'Ideal-Gas Properties of Hydrogen (H₂)' },
+  { id: 'idealH2O', label: 'Ideal-Gas Properties of Water Vapor (H₂O)' },
+  { id: 'idealN2', label: 'Ideal-Gas Properties of Nitrogen (N₂)' },
+  { id: 'idealO', label: 'Ideal-Gas Properties of Monatomic Oxygen (O)' },
+  { id: 'idealO2', label: 'Ideal-Gas Properties of Oxygen (O₂)' },
+  { id: 'idealOH', label: 'Ideal-Gas Properties of Hydroxyl (OH)' },
+  { id: 'specHeat', label: 'Ideal Gas Specific Heat (Temperature)' },
+  { id: 'specHeat300', label: 'Ideal Gas Specific Heat @ 300 K' },
+  { id: 'molGCP', label: 'Molar-Specific Gas Properties' },
+  { id: 'compLiqWat', label: 'Compressed Liq. Water' },
+  { id: 'pressureSatR134', label: 'Saturated Refrigerant-134a (Pressure)' },
+  { id: 'temperatureSatR134', label: 'Saturated Refrigerant-134a (Temperature)' },
+  { id: 'SatIceWat', label: 'Saturated Ice-Water Vapor' },
+  { id: 'pressureSatWater', label: 'Saturated Water (Pressure)' },
+  { id: 'temperatureSatWater', label: 'Saturated Water (Temperature)' },
+  { id: 'superheatedH20', label: 'Superheated Water' },
+  { id: 'superheatedR134', label: 'Superheated Refrigerant-134a' }
+];
+
+
+
   type FluidType = 'pressureSatWater' | 'temperatureSatWater' | 'superheatedH20' | 'compLiqWat' | 'SatIceWat' | 'temperatureSatR134' | 'pressureSatR134' | 'superheatedR134' | 'airData' | 'idealN2' | 'idealO2'
   | 'idealCO2' | 'idealCO' | 'idealH2' | 'idealH2O' | 'idealO' | 'molGCP' | 'specHeat300' | 'specHeat' | 'idealOH';
 
@@ -89,27 +179,75 @@ $: if (selectedFluid !== previousFluid) {
     selectedSubstance = selectedFluid.replace('ideal', '').toLowerCase();
   }
 
-  const fluidInputs: Record<FluidType, Array<{id: string, label: string}>> = {
-    molGCP: [], specHeat300: [],
-    specHeat: [{ id: 'temperature', label: 'Temperature'}],
-    pressureSatWater: [{ id: 'quality', label: 'Quality' }, { id: 'pressure', label: 'Pressure' }],
-    temperatureSatWater: [{ id: 'quality', label: 'Quality' }, { id: 'temperature', label: 'Temperature' }],
-    superheatedH20: [{ id: 'temperature', label: 'Temperature' }, { id: 'pressure', label: 'Pressure' }],
-    compLiqWat: [{ id: 'temperature', label: 'Temperature' }, { id: 'pressure', label: 'Pressure' }],
-    SatIceWat: [{ id: 'quality', label: 'Quality' }, { id: 'temperature', label: 'Temperature' }],
-    temperatureSatR134: [{ id: 'quality', label: 'Quality' }, { id: 'temperature', label: 'Temperature' }],
-    pressureSatR134: [{ id: 'quality', label: 'Quality' }, { id: 'pressure', label: 'Pressure' }],
-    superheatedR134: [{ id: 'temperature', label: 'Temperature' }, { id: 'pressure', label: 'Pressure' }],
-    airData: [{ id: 'temperature', label: 'Temperature' }],
-    idealN2: [{ id: 'temperature', label: 'Temperature' }],
-    idealO2: [{ id: 'temperature', label: 'Temperature' }],
-    idealCO2: [{ id: 'temperature', label: 'Temperature' }],
-    idealCO: [{ id: 'temperature', label: 'Temperature' }],
-    idealH2: [{ id: 'temperature', label: 'Temperature' }],
-    idealH2O: [{ id: 'temperature', label: 'Temperature' }],
-    idealO: [{ id: 'temperature', label: 'Temperature' }],
-    idealOH: [{ id: 'temperature', label: 'Temperature' }]
-  };
+const fluidInputs: Record<FluidType, Array<{ id: string, label: string }>> = {
+  molGCP: [],
+  specHeat300: [],
+  specHeat: [
+    { id: 'temperature', label: 'Temperature <i>(T, K)</i>' }
+  ],
+  pressureSatWater: [
+    { id: 'quality', label: 'Quality <i>(x)</i>' },
+    { id: 'pressure', label: 'Pressure <i>(bar)</i>' }
+  ],
+  temperatureSatWater: [
+    { id: 'quality', label: 'Quality <i>(x)</i>' },
+    { id: 'temperature', label: 'Temperature <i>(°C)</i>' }
+  ],
+  superheatedH20: [
+    { id: 'temperature', label: 'Temperature <i>(°C)</i>' },
+    { id: 'pressure', label: 'Pressure <i>(bar)</i>' }
+  ],
+  compLiqWat: [
+    { id: 'temperature', label: 'Temperature <i>(°C)</i>' },
+    { id: 'pressure', label: 'Pressure <i>(bar)</i>' }
+  ],
+  SatIceWat: [
+    { id: 'quality', label: 'Quality <i>(x)</i>' },
+    { id: 'temperature', label: 'Temperature <i>(°C)</i>' }
+  ],
+  temperatureSatR134: [
+    { id: 'quality', label: 'Quality <i>(x)</i>' },
+    { id: 'temperature', label: 'Temperature <i>(°C)</i>' }
+  ],
+  pressureSatR134: [
+    { id: 'quality', label: 'Quality <i>(x)</i>' },
+    { id: 'pressure', label: 'Pressure <i>(bar)</i>' }
+  ],
+  superheatedR134: [
+    { id: 'temperature', label: 'Temperature <i>(°C)</i>' },
+    { id: 'pressure', label: 'Pressure <i>(bar)</i>' }
+  ],
+  airData: [
+    { id: 'temperature', label: 'Temperature <i>(K)</i>' }
+  ],
+  idealN2: [
+    { id: 'temperature', label: 'Temperature <i>(K)</i>' }
+  ],
+  idealO2: [
+    { id: 'temperature', label: 'Temperature <i>(K)</i>' }
+  ],
+  idealCO2: [
+    { id: 'temperature', label: 'Temperature <i>(K)</i>' }
+  ],
+  idealCO: [
+    { id: 'temperature', label: 'Temperature <i>(K)</i>' }
+  ],
+  idealH2: [
+    { id: 'temperature', label: 'Temperature <i>(K)</i>' }
+  ],
+  idealH2O: [
+    { id: 'temperature', label: 'Temperature <i>(K)</i>' }
+  ],
+  idealO: [
+    { id: 'temperature', label: 'Temperature <i>(K)</i>' }
+  ],
+  idealOH: [
+    { id: 'temperature', label: 'Temperature <i>(K)</i>' }
+  ]
+};
+
+
+
 
  
   async function calculate() {
@@ -183,114 +321,219 @@ const response = await fetch(endpoint, {
 </script>
 
 
+<div class="container">
 <label for="fluidDropdown">Calculate for:</label>
-<select id="fluidDropdown" bind:value={selectedFluid}>
-  <option value="">-- Select --</option>
-  <option value="molGCP">Molar-Specific Gas Properties</option>
-  <option value="specHeat300">Ideal Gas Specific Heat @ 300 K</option>
-  <option value="specHeat">Ideal Gas Specific Heat (Temperature)</option>
-  <option value="pressureSatWater">Saturated Water (Pressure)</option>
-  <option value="temperatureSatWater">Saturated Water (Temperature)</option>
-  <option value="superheatedH20">Superheated Water</option>
-  <option value="compLiqWat">Compressed Liq. Water</option>
-  <option value="SatIceWat">Saturated Ice-Water Vapor</option>
-  <option value="temperatureSatR134">Saturated Refrigerant-134a (Temperature)</option>
-  <option value="pressureSatR134">Saturated Refrigerant-134a (Pressure)</option>
-  <option value="superheatedR134">Superheated Refrigerant-134a</option>
-  <option value="airData">Ideal-Gas Properties of Air</option>
-  <option value="idealN2">Ideal-Gas Properties of Nitrogen (N₂)</option>
-  <option value="idealO2">Ideal-Gas Properties of Oxygen (O₂)</option>
-  <option value="idealCO2">Ideal-Gas Properties of Carbon Dioxide (CO₂)</option>
-  <option value="idealCO">Ideal-Gas Properties of Carbon Monoxide (CO)</option>
-  <option value="idealH2">Ideal-Gas Properties of Hydrogen (H₂)</option>
-  <option value="idealH2O">Ideal-Gas Properties of Water Vapor (H₂O)</option>
-  <option value="idealO">Ideal-Gas Properties of Monatomic Oxygen (O)</option>
-  <option value="idealOH">Ideal-Gas Properties of Hydroxyl (OH)</option>
-</select>
+<input
+  list="fluidOptions"
+  id="fluidDropdown"
+  bind:value={searchText}
+  placeholder="Type or choose a fluid..."
+  on:change={() => {
+    const match = fluidOptions.find(f => f.label === searchText);
+    if (match) selectedFluid = match.id;
+  }}
+/>
+
+<datalist id="fluidOptions">
+  {#each fluidOptions as fluid}
+    <option value={fluid.label}>{fluid.label}</option>
+  {/each}
+</datalist>
 
 
-{#if selectedFluid === 'molGCP'}
-  <div style="margin-top: 10px;">
-    <label for="substanceDropdown">Select Gas:</label>
-    <select id="substanceDropdown" bind:value={selectedSubstance}>
-      <option value="">-- Choose Gas --</option>
-      {#each molGCPSubstances as substance}
-        <option value={substance.id}>{substance.name}</option>
-      {/each}
-    </select>
-  </div>
-
-{:else if selectedFluid === 'specHeat300'}
-  <div style="margin-top: 10px;">
-    <label for="substanceDropdown">Select Gas:</label>
-    <select id="substanceDropdown" bind:value={selectedSubstance}>
-      <option value="">-- Choose Gas --</option>
-      {#each specHeat300Substances as substance}
-        <option value={substance.id}>{substance.name}</option>
-      {/each}
-    </select>
-  </div>
-
-{:else if selectedFluid === 'specHeat'}
-  <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+  {#if selectedFluid === 'molGCP'}
     <div>
-      <label for="specHeatGas">Select Gas:</label>
-      <select id="specHeatGas" bind:value={selectedSubstance}>
+      <label for="substanceDropdown">Select Gas:</label>
+      <select id="substanceDropdown" bind:value={selectedSubstance}>
         <option value="">-- Choose Gas --</option>
-        {#each specHeat as gas}
-          <option value={gas.id}>{gas.name}</option>
+        {#each molGCPSubstances as substance}
+          <option value={substance.id}>{substance.name}</option>
         {/each}
       </select>
     </div>
+
+  {:else if selectedFluid === 'specHeat300'}
     <div>
-      <label for="temperature">Temperature (K):</label>
-      <input id="temperature" type="number" min="250" max="1000" placeholder="250-1000 K" bind:value={inputValues.temperature} />
+      <label for="substanceDropdown">Select Gas:</label>
+      <select id="substanceDropdown" bind:value={selectedSubstance}>
+        <option value="">-- Choose Gas --</option>
+        {#each specHeat300Substances as substance}
+          <option value={substance.id}>{substance.name}</option>
+        {/each}
+      </select>
     </div>
-  </div>
-{:else if selectedFluid.startsWith('ideal')}
-  <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
-    <div>
-      <label for="temperature">Temperature (K):</label>
-      <input
-        id="temperature"
-        type="number"
-        min="250"
-        max="1000"
-        placeholder="Enter temperature (250–1000 K)"
-        bind:value={inputValues.temperature}
-      />
-    </div>
+
+{:else if selectedFluid === 'specHeat'}
+  <div>
+    <label for="specHeatGas">Select Gas:</label>
+    <select id="specHeatGas" bind:value={selectedSubstance}>
+      <option value="">-- Choose Gas --</option>
+      {#each specHeat as gas}
+        <option value={gas.id}>{gas.name}</option>
+      {/each}
+    </select>
+
+    <label for="temperature">Temperature (K):</label>
+    <input
+      id="temperature"
+      type="number"
+      min="250"
+      max="1000"
+      placeholder="250 - 1000 K"
+      bind:value={inputValues.temperature}
+    />
   </div>
 
+{:else if selectedFluid && selectedFluid in fluidInputs}
+  <div>
+    {#each fluidInputs[selectedFluid as FluidType] as input}
+      <label for={input.id}>{@html input.label}:</label>
+      <input
+        id={input.id}
+        type="text"
+        bind:value={inputValues[input.id]}
+        placeholder={getPlaceholder(input.id, selectedFluid as FluidType)}
+      />
+    {/each}
+  </div>
 
 {:else if selectedFluid && fluidInputs[selectedFluid]}
-  <div style="margin-top: 10px;">
+  <div>
     {#each fluidInputs[selectedFluid] as input}
-      <label for={input.id}>{input.label}:</label>
-      <input id={input.id} type="text" bind:value={inputValues[input.id]} />
+      <label for={input.id}>{@html input.label}:</label>
+      <input
+        id={input.id}
+        type="text"
+        bind:value={inputValues[input.id]}
+        placeholder={getPlaceholder(input.id, selectedFluid as FluidType)}
+      />
     {/each}
   </div>
 {/if}
 
 
-{#if selectedFluid}
-  <div style="margin-top: 20px;">
+  {#if selectedFluid}
     <button on:click={calculate}>Calculate</button>
-  </div>
-{/if}
+  {/if}
 
 {#if resultMessage}
   <div style="margin-top: 20px;">
     <strong>Result:</strong>
-    {#if typeof resultMessage === 'object'}
-      <div style="margin-left: 20px;">
-        {#each Object.entries(resultMessage) as [key, value]}
-          <p><strong>{key}:</strong> {value}</p>
-        {/each}
-      </div>
+
+    {#if typeof resultMessage === 'object' && resultMessage !== null}
+      <table>
+        <thead>
+          <tr>
+            {#each Object.entries(resultMessage) as [key, _]}
+              <th>
+                <div style="font-weight: bold;">{@html key.split('<br>')[0]}</div>
+                <div style="font-size: 0.8rem; color: #444; line-height: 1.1;">{@html key.split('<br>')[1]}</div>
+              </th>
+
+            {/each}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {#each Object.entries(resultMessage) as [_, value]}
+              <td>
+                {typeof value === 'number' ? value.toLocaleString() : value}
+              </td>
+            {/each}
+          </tr>
+        </tbody>
+      </table>
     {:else}
-      <p>{resultMessage}</p>
+      <p style="color: white; background-color: #b00020; padding: 10px; border-radius: 6px; max-width: 600px; margin: 0 auto;">
+        {resultMessage}
+      </p>
     {/if}
   </div>
 {/if}
+</div>
 
+
+<style>
+  :global(body) {
+    background-color: #7A0019;
+    margin: 0;
+    font-family: 'Latin Modern Math', 'STIX Two Math', 'Cambria Math', serif;
+    color: white;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: white;
+    color: #000;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  }
+
+  label {
+    font-weight: bold;
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 6px;
+  }
+
+  select,
+  input {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 16px;
+    color: black;
+    background-color: #f0f4ff;
+  }
+
+  button {
+    background-color: #FFCC33; /* U of M Gold */
+    color: #7A0019;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  button:hover {
+    background-color: #e6b800;
+  }
+
+  strong {
+    font-size: 1.2rem;
+    display: block;
+    margin-top: 20px;
+  }
+
+  table {
+    width: 100%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    text-align: center;
+  }
+
+th {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+  max-width: 150px;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+  td {
+    border: 1px solid #ddd;
+    padding: 12px;
+  }
+
+  thead {
+    background-color: #f7f7f7;
+  }
+</style>

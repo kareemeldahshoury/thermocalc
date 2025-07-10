@@ -157,10 +157,10 @@ class IdealAirProperties:
             s = interpolate(v1[4], v2[4], T1, T2, self.T)
 
         return {
-            "temperature": self.T,
-            "enthalpy (h)": round(h, 2),
-            "relative_pressure (Pr)": round(Pr, 4),
-            "internal_energy (u)": round(u, 2),
-            "specific_volume (vr)": round(vr, 3),
-            "entropy (s°)": round(s, 5),
+            "Temperature<br><span style='font-size: 0.8em;'>(T, K)</span>": self.T,
+            "Enthalpy<br><span style='font-size: 0.8em;'>(h, kJ/kg)</span>": round(h, 2),
+            "Relative Pressure<br><span style='font-size: 0.8em;'>(P<sub>r</sub>)</span>": round(Pr, 4),
+            "Internal Energy<br><span style='font-size: 0.8em;'>(u, kJ/kg)</span>": round(u, 2),
+            "Specific Volume<br><span style='font-size: 0.8em;'>(v<sub>r</sub>)</span>": round(vr, 3),
+            "Entropy<br><span style='font-size: 0.8em;'>(s<sup>°</sup>, kJ/kg·K)</span>": round(s, 5)
         }

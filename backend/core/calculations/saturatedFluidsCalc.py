@@ -48,14 +48,14 @@ class SaturatedFluidCalculation:
         u = uf + self.x_value * ufg
         h = hf + self.x_value * hfg
         s = sf + self.x_value * sfg
-
         return {
-            "fluid_type": self.fluid_type,
-            self.lookup_type: self.lookup_value,
-            "quality": self.x_value,
-            "saturation_temperature": round(temp_sat, 2),
-            "specific_volume": round(v, 6),
-            "internal_energy": round(u, 2),
-            "enthalpy": round(h, 2),
-            "entropy": round(s, 4),
-        }
+    **{
+        f"{'Pressure' if self.lookup_type == 'pressure' else 'Temperature'}<br>(<em>{'P' if self.lookup_type == 'pressure' else 'T'}</em>, {'bar' if self.lookup_type == 'pressure' else '°C'})": self.lookup_value
+        },
+            "Quality<br>(<em>x</em>)": self.x_value,
+            "Saturation Temperature<br>(<em>T<sub>sat</sub></em> , °C)": round(temp_sat, 2),
+            "Specific Volume<br>(<em>v</em>, m³/kg)": round(v, 6),
+            "Internal Energy<br>(<em>u</em>, kJ/kg)": round(u, 2),
+            "Enthalpy<br>(<em>h</em>, kJ/kg)": round(h, 2),
+            "Entropy<br>(<em>s</em>, kJ/kg·K)": round(s, 4)
+}

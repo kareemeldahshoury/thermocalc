@@ -30,8 +30,9 @@ class IdealGasProperties:
             s = interpolate(v1[2], v2[2], T1, T2, self.T)
 
         return {
-            "temperature (K)": self.T,
-            "enthalpy (h) [kJ/kg]": round(h, 4),
-            "internal energy (u) [kJ/kg]": round(u, 4),
-            "entropy (s°) [kJ/kg·K]": round(s, 5),
+            "Temperature<br>(T, K)": self.T,
+            "Enthalpy<br>(h\u0304, kJ/kg)": round(h, 4),
+            "Internal Energy<br>(ū, kJ/kg)": round(u, 4),
+            "Entropy<br>(s̄°, kJ/kg·K)": round(s, 5),
         }
+
