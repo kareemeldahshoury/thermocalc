@@ -329,6 +329,12 @@ const response = await fetch(endpoint, {
 
 
 <div class="container">
+
+<div class="header-bar">
+  <h2>Table Search</h2>
+</div>
+
+
 <label for="fluidDropdown">Calculate for:</label>
 <input
   list="fluidOptions"
@@ -489,7 +495,7 @@ const response = await fetch(endpoint, {
   .container {
     max-width: 800px;
     margin: 40px auto;
-    padding: 20px;
+    padding: 5px 30px 30px 30px;
     background-color: white;
     color: #000;
     border-radius: 12px;
@@ -499,7 +505,7 @@ const response = await fetch(endpoint, {
   label {
     font-weight: bold;
     display: block;
-    margin-top: 20px;
+    margin-top: 42px;
     margin-bottom: 6px;
   }
 
@@ -561,4 +567,21 @@ th {
   thead {
     background-color: #f7f7f7;
   }
+
+  .header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 27px;
+}
+
+.header-bar h2 {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #7A0019; /* Maroon */
+  margin: 0;
+}
+
+
+
 </style>
