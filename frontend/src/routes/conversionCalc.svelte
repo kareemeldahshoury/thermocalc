@@ -1,10 +1,19 @@
 <script lang="ts">
+  import ConversionTable from './conversionTable.svelte';
+
+  let showTable = false;
+
+  // Toggle between calculator and table
+  function toggleView() {
+    showTable = !showTable;
+  }
+
+  // --- Calculator state ---
   let selectedCategory = '';
   let selectedUnit = '';
   let targetUnit = '';
   let inputValue = '';
   let conversionResult = '';
-
   let unitOptions: string[] = [];
 
   const unitGroups: Record<string, string[]> = {
@@ -78,99 +87,102 @@
 
   $: targetOptions = unitOptions.filter(u => u !== selectedUnit);
 
-async function calculateConversion() {
-  try {
-    const payload = {
-      inputValue: parseFloat(inputValue),
-      fromUnit: selectedUnit,
-      toUnit: targetUnit
-    };
+  async function calculateConversion() {
+    try {
+      const payload = {
+        inputValue: parseFloat(inputValue),
+        fromUnit: selectedUnit,
+        toUnit: targetUnit
+      };
 
-    const response = await fetch("http://localhost:8000/api/calculate/unitConversion", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+      const response = await fetch("http://localhost:8000/api/calculate/unitConversion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Server error: ${response.status} - ${errText}`);
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Server error: ${response.status} - ${errText}`);
+      }
+
+      const data = await response.json();
+
+      if (typeof data.result === 'string' && data.result.startsWith("Error")) {
+        conversionResult = data.result;
+      } else {
+        conversionResult = `${inputValue} ${selectedUnit} = ${data.result} ${targetUnit}`;
+      }
+
+    } catch (error) {
+      conversionResult = `Conversion failed: ${(error as Error).message}`;
     }
-
-    const data = await response.json();
-
-    if (typeof data.result === 'string' && data.result.startsWith("Error")) {
-      conversionResult = data.result;
-    } else {
-      conversionResult = `${inputValue} ${selectedUnit} = ${data.result} ${targetUnit}`;
-    }
-
-  } catch (error) {
-    conversionResult = `Conversion failed: ${(error as Error).message}`;
   }
-}
-
 </script>
 
-<div class="conversion-table">
-
+<!-- 🔁 View Switching -->
+{#if showTable}
+  <ConversionTable />
+  <div class="top-right-btn">
+    <button class="nav-btn" on:click={toggleView}>Back to Calculator</button>
+  </div>
+{:else}
+  <div class="conversion-table">
     <div class="top-right-btn">
-       <button class="nav-btn">Conversion Table</button>
+      <button class="nav-btn" on:click={toggleView}>Conversion Table</button>
     </div>
 
-  <h2>Conversion Calculator</h2>
+    <h2>Conversion Calculator</h2>
 
-  <label for="unitType">Choose a category:</label>
-  <select id="unitType" on:change={updateUnitOptions}>
-    <option value="">--Select Category--</option>
-    {#each Object.keys(unitGroups) as key}
-      <option value={key}>{key}</option>
-    {/each}
-  </select>
-
-  {#if unitOptions.length}
-    <label for="unitOption">Choose from unit:</label>
-    <select id="unitOption" bind:value={selectedUnit}>
-      <option value="">--Select Unit--</option>
-      {#each unitOptions as unit}
-        <option value={unit}>{unit}</option>
-      {/each}
-    </select>
-  {/if}
-
-  {#if selectedUnit}
-    <label for="targetOption">Convert to:</label>
-    <select id="targetOption" bind:value={targetUnit}>
-      <option value="">--Select Target Unit--</option>
-      {#each targetOptions as unit}
-        <option value={unit}>{unit}</option>
+    <label for="unitType">Choose a category:</label>
+    <select id="unitType" on:change={updateUnitOptions}>
+      <option value="">--Select Category--</option>
+      {#each Object.keys(unitGroups) as key}
+        <option value={key}>{key}</option>
       {/each}
     </select>
 
-    <label for="valueInput">Enter value:</label>
-    <input
-      type="number"
-      id="valueInput"
-      placeholder="Enter a value..."
-      bind:value={inputValue}
-    />
-
-    {#if targetUnit && inputValue}
-      <button
-        class="calc-btn"
-        on:click={calculateConversion}
-      >
-        Calculate
-      </button>
+    {#if unitOptions.length}
+      <label for="unitOption">Choose from unit:</label>
+      <select id="unitOption" bind:value={selectedUnit}>
+        <option value="">--Select Unit--</option>
+        {#each unitOptions as unit}
+          <option value={unit}>{unit}</option>
+        {/each}
+      </select>
     {/if}
-  {/if}
 
-  {#if conversionResult}
-    <div class="result-popup">
-      <strong></strong> {conversionResult}
-    </div>
-  {/if}
-</div>
+    {#if selectedUnit}
+      <label for="targetOption">Convert to:</label>
+      <select id="targetOption" bind:value={targetUnit}>
+        <option value="">--Select Target Unit--</option>
+        {#each targetOptions as unit}
+          <option value={unit}>{unit}</option>
+        {/each}
+      </select>
+
+      <label for="valueInput">Enter value:</label>
+      <input
+        type="number"
+        id="valueInput"
+        placeholder="Enter a value..."
+        bind:value={inputValue}
+      />
+
+      {#if targetUnit && inputValue}
+        <button class="calc-btn" on:click={calculateConversion}>
+          Calculate
+        </button>
+      {/if}
+    {/if}
+
+    {#if conversionResult}
+      <div class="result-popup">
+        {conversionResult}
+      </div>
+    {/if}
+  </div>
+{/if}
 
 <style>
   :global(body) {
@@ -180,15 +192,15 @@ async function calculateConversion() {
     color: white;
   }
 
-.conversion-table {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 5px 30px 30px 30px; /* top reduced from 30px to 10px */
-  background-color: white;
-  color: black;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-}
+  .conversion-table {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 5px 30px 30px 30px;
+    background-color: white;
+    color: black;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  }
 
   label {
     font-weight: bold;
@@ -211,9 +223,9 @@ async function calculateConversion() {
   }
 
   h2 {
-    font-size: 1.4rem;      /* Increase size (adjust as needed) */
-    font-weight: bold;    /* Ensure it's bold */
-    color: #7A0019;       /* Optional: keep your maroon color */
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #7A0019;
     margin-top: -40px;
   }
 
@@ -232,41 +244,39 @@ async function calculateConversion() {
     background-color: #9c0033;
   }
 
-.result-popup {
-  margin-top: 20px;
-  background-color: #f7f7f7;
-  color: #000;
-  padding: 14px 20px;
-  border-radius: 8px;
-  font-size: clamp(0.75rem, 1.8vw, 1rem); 
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  font-weight: 500;
-  white-space: nowrap;   
-  overflow-x: auto;       
-  max-width: 100%;         
-}
+  .result-popup {
+    margin-top: 20px;
+    background-color: #f7f7f7;
+    color: #000;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: clamp(0.75rem, 1.8vw, 1rem);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow-x: auto;
+    max-width: 100%;
+  }
 
-.top-right-btn {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 30px;
-}
+  .top-right-btn {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+  }
 
-.nav-btn {
-  background-color: #7A0019;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  font-size: 0.9rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
+  .nav-btn {
+    background-color: #7A0019;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
 
-.nav-btn:hover {
-  background-color: #9c0033;
-}
-
-
+  .nav-btn:hover {
+    background-color: #9c0033;
+  }
 </style>
