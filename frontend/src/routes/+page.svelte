@@ -1,5 +1,6 @@
 <script lang="ts">
   import TableCalculation from './tableCalculation.svelte';
+  import ConversionCalc from './conversionCalc.svelte';
   let selectedCalculator = '';
   let query = '';
 </script>
@@ -22,13 +23,13 @@
         <button
           class:selected={selectedCalculator === 'calc1'}
           on:click={() => selectedCalculator = 'calc1'}>
-          Table Search
+          Conversion Calculator
         </button>
 
         <button
           class:selected={selectedCalculator === 'calc2'}
           on:click={() => selectedCalculator = 'calc2'}>
-          Calculator 2
+          Table Search
         </button>
 
         <button
@@ -53,9 +54,9 @@
 
     <main class="main-content">
       {#if selectedCalculator === 'calc1'}
-        <TableCalculation />
+        <ConversionCalc />
       {:else if selectedCalculator === 'calc2'}
-        <p>Calculator 2 coming soon...</p>
+        <TableCalculation />
       {:else if selectedCalculator === 'calc3'}
         <p>Calculator 3 coming soon...</p>
       {:else if selectedCalculator === 'calc4'}
@@ -146,7 +147,7 @@
   display: flex;
   flex-direction: column;
   background: #ffffff;
-  margin-top: 24px;
+  margin-top: 16px;
 }
 
 .button-group {
@@ -175,8 +176,8 @@
   background-color: #ffffff;
   font-weight: bold;
   border-left: 4px solid #7A0019;
-  border-top: 1px solid #000000;
-  border-bottom: 1px solid #000000;
+  border-top: 1.5px solid #7A0019;
+  border-bottom: 1.5px solid #7A0019;
 }
 
 .main-content {
@@ -185,6 +186,6 @@
   background-color: #ffffff;
   color: #333;
   overflow-y: auto;
-  margin-top: 24px;
+  margin-top: 16px;
 }
 </style>

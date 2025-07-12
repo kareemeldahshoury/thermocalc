@@ -2,7 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.models.calculationRequest import CalculationRequest
 from backend.controller.calculationController import ( handle_calculation_superHeatedWater, handle_calculation_idealAir,
-handle_calculation_superheated134, handle_calculation_molGCP, handle_calculation_specHeat300, handle_calculation_specHeat, handle_calculation_idealGas, handle_calculation_saturatedFluid)
+handle_calculation_superheated134, handle_calculation_molGCP, handle_calculation_specHeat300, handle_calculation_specHeat, handle_calculation_idealGas, handle_calculation_saturatedFluid,
+handle_unit_conversion)
+from pydantic import BaseModel
+from typing import Union
+from backend.models.unitConversionModel import UnitConversionRequest
+
 
 app = FastAPI()
 
@@ -13,7 +18,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-    
 
 @app.post("/api/calculate/superHeatedWater")
 def calculate_superHeatedWater(req: CalculationRequest):
@@ -126,6 +130,20 @@ def calculate_saturatedFluid(req: CalculationRequest):
         result = handle_calculation_saturatedFluid(
             fluid_type=req.fluidType,
             inputs=req.inputs
+        )
+        return {"result": result}
+    except ValueError as e:
+        return {"result": f"Error: {str(e)}"}
+    except Exception as e:
+        return {"result": f"Unexpected error: {str(e)}"}
+    
+@app.post("/api/calculate/unitConversion")
+def calculate_unit_conversion(req: UnitConversionRequest):
+    try:
+        result = handle_unit_conversion(
+            from_unit=req.from_unit,
+            to_unit=req.to_unit,
+            value=req.input_value
         )
         return {"result": result}
     except ValueError as e:

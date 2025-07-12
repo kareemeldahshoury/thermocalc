@@ -516,8 +516,8 @@ const response = await fetch(endpoint, {
   }
 
   button {
-    background-color: #FFCC33; /* U of M Gold */
-    color: #7A0019;
+    background-color: #7A0019; /* U of M Gold */
+    color: #ffffff;
     border: none;
     padding: 10px 20px;
     font-weight: bold;
@@ -528,7 +528,7 @@ const response = await fetch(endpoint, {
   }
 
   button:hover {
-    background-color: #e6b800;
+    background-color: #9c0033;
   }
 
   strong {
