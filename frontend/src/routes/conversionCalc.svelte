@@ -113,6 +113,11 @@ async function calculateConversion() {
 </script>
 
 <div class="conversion-table">
+
+    <div class="top-right-btn">
+       <button class="nav-btn">Conversion Table</button>
+    </div>
+
   <h2>Conversion Calculator</h2>
 
   <label for="unitType">Choose a category:</label>
@@ -175,20 +180,20 @@ async function calculateConversion() {
     color: white;
   }
 
-  .conversion-table {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 30px;
-    background-color: white;
-    color: black;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-  }
+.conversion-table {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 5px 30px 30px 30px; /* top reduced from 30px to 10px */
+  background-color: white;
+  color: black;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
 
   label {
     font-weight: bold;
     display: block;
-    margin-top: 20px;
+    margin-top: 40px;
     margin-bottom: 6px;
   }
 
@@ -209,7 +214,7 @@ async function calculateConversion() {
     font-size: 1.4rem;      /* Increase size (adjust as needed) */
     font-weight: bold;    /* Ensure it's bold */
     color: #7A0019;       /* Optional: keep your maroon color */
-    margin-bottom: 20px;
+    margin-top: -40px;
   }
 
   .calc-btn {
@@ -233,13 +238,34 @@ async function calculateConversion() {
   color: #000;
   padding: 14px 20px;
   border-radius: 8px;
-  font-size: clamp(0.75rem, 1.8vw, 1rem); /* Slightly smaller */
+  font-size: clamp(0.75rem, 1.8vw, 1rem); 
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
   text-align: center;
   font-weight: 500;
-  white-space: nowrap;     /* Keep on one line */
-  overflow-x: auto;        /* Allow scrolling if needed */
-  max-width: 100%;         /* Prevents overflow beyond container */
+  white-space: nowrap;   
+  overflow-x: auto;       
+  max-width: 100%;         
+}
+
+.top-right-btn {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 30px;
+}
+
+.nav-btn {
+  background-color: #7A0019;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.nav-btn:hover {
+  background-color: #9c0033;
 }
 
 
