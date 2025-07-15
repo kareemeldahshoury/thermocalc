@@ -494,7 +494,7 @@ const response = await fetch(endpoint, {
 
   .container {
     max-width: 800px;
-    margin: 40px auto;
+    margin: -10px auto;
     padding: 5px 30px 30px 30px;
     background-color: white;
     color: #000;
@@ -509,7 +509,13 @@ const response = await fetch(endpoint, {
     margin-bottom: 6px;
   }
 
-  select,
+  select {
+  width: 100%;
+  min-width: 300px;
+  padding: 10px;
+  font-size: 1rem;
+}
+
   input {
     width: 100%;
     padding: 10px;
@@ -582,6 +588,9 @@ th {
   margin: 0;
 }
 
-
+option {
+  white-space: normal;
+  max-width: 100%;
+}
 
 </style>

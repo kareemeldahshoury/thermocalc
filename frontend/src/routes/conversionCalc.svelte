@@ -120,7 +120,7 @@
   }
 </script>
 
-<!-- 🔁 View Switching -->
+
 {#if showTable}
   <ConversionTable />
   <div class="top-right-btn">
@@ -194,7 +194,7 @@
 
   .conversion-table {
     max-width: 800px;
-    margin: 40px auto;
+    margin: -10px auto;
     padding: 5px 30px 30px 30px;
     background-color: white;
     color: black;

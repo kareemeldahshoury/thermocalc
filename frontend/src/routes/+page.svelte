@@ -12,9 +12,22 @@
   </div>
 </nav>
 
+
+
+
 <div class="logo-bar">
   <img src="/images/Logo.png" alt="Thermo Solver" class="center-logo" />
 </div>
+
+<div class="subject-bar">
+  <button class="subject-tab">Thermodynamics</button>
+  <button class="subject-tab">Fluids</button>
+  <button class="subject-tab">Heat Transfer</button>
+  <button class="subject-tab">Combustion</button>
+</div>
+
+<div class="section-divider"></div>
+
 
 <div class="page">
   <div class="layout">
@@ -74,7 +87,7 @@
 :global(body, html) {
   margin: 0;
   padding: 0;
-  background-color: #f2f2f2;
+  background-color: #ffffff;
   font-family: system-ui, sans-serif;
   height: 100%;
 }
@@ -136,26 +149,29 @@
 .layout {
   display: flex;
   flex-grow: 1;
-  background-color: #f2f2f2;
+  background-color: #ffffff;
   margin-top: 24px;
 }
 
 .sidebar {
-  width: 200px;
-  height: 100%;
+  width: 300px;
+  height: 110%;
   padding: 0;
   display: flex;
   flex-direction: column;
-  background: #ffffff;
-  margin-top: 16px;
+  background: #f9f9f9;
+  margin-top: -25px;
+  max-width: 300px
 }
 
 .button-group {
   display: flex;
   flex-direction: column;
-  width: 100%;           /* important to make buttons align fully */
+  width: 100%;          
   background-color: transparent;
-  margin-top: 70px
+  margin-top: 1px;
+  gap: 2px;
+  margin-right: 0px
 }
 
 .sidebar button {
@@ -170,6 +186,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
+  box-sizing: border-box
 }
 
 .sidebar button.selected {
@@ -188,4 +206,40 @@
   overflow-y: auto;
   margin-top: 16px;
 }
+
+.subject-bar {
+  background-color: #f3f3f3;
+  padding: 8px 24px;
+  display: flex;
+  gap: 20px;
+  border-bottom: 2px solid #ccc;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.subject-tab {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  color: #000000;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.subject-tab:hover {
+  color: #7A0019;
+  border-color: #7A0019;
+}
+
+.section-divider {
+  width: 100%;
+  height: 25px;
+  background-color: #f9f9f9;
+
+}
+
+
 </style>
