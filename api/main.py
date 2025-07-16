@@ -7,9 +7,16 @@ handle_unit_conversion)
 from pydantic import BaseModel
 from typing import Union
 from backend.models.unitConversionModel import UnitConversionRequest
-
+from fastapi.staticfiles import StaticFiles
+import os
+from backend.core.calculations.questions import questions
+import random
+from fastapi import Body
 
 app = FastAPI()
+
+static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend', 'static'))
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -150,3 +157,37 @@ def calculate_unit_conversion(req: UnitConversionRequest):
         return {"result": f"Error: {str(e)}"}
     except Exception as e:
         return {"result": f"Unexpected error: {str(e)}"}
+    
+@app.get("/api/practice/random")
+def get_random_question():
+    q_id = random.choice(list(questions.keys()))
+    q = questions[q_id]
+    return {
+        "id": q_id,
+        "image": q["image"],                      # e.g. "/images/q1.png"
+        "num_answers": len(q["answers"])          # Needed to render number of input boxes
+    }
+
+
+@app.post("/api/practice/validate")
+def validate_practice_answers(data: dict = Body(...)):
+    q_id = data.get("id")
+    user_answers = data.get("answers", [])
+
+    if q_id not in questions:
+        return {"error": "Invalid question ID"}
+
+    correct_answers = questions[q_id]["answers"]
+    result = []
+
+    for user, correct in zip(user_answers, correct_answers):
+        try:
+            # Allow 5% tolerance
+            result.append(abs(user - correct) / abs(correct) <= 0.05)
+        except ZeroDivisionError:
+            result.append(user == correct)
+
+    return {
+        "correct": result,
+        "all_correct": all(result)
+    }

@@ -131,10 +131,10 @@ class SpecHeat:
             k = interpolate(v1[2], v2[2], T1, T2, self.T)
 
         return {
-            "temperature": round(self.T, 2),
+            "Temperature (K)": round(self.T, 2),
             "cₚ (kJ/kg·K)": round(cp, 4),
             "cᵥ (kJ/kg·K)": round(cv, 4),
-            "k = cₚ/cᵥ": round(k, 4)
+            "k (cₚ/cᵥ) ": round(k, 4)
         }
 
 def specHeatCalculation(substance: str, inputs: Dict[str, str]):
