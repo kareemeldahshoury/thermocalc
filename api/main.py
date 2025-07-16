@@ -9,9 +9,11 @@ from typing import Union
 from backend.models.unitConversionModel import UnitConversionRequest
 from fastapi.staticfiles import StaticFiles
 import os
-from backend.core.calculations.questions import questions
+from backend.core.calculations.questions import questions_by_unit
 import random
 from fastapi import Body
+from fastapi import APIRouter, Query
+from backend.core.calculations.questions import (questions_firstLaw, questions_unitConversion)
 
 app = FastAPI()
 
@@ -158,31 +160,44 @@ def calculate_unit_conversion(req: UnitConversionRequest):
     except Exception as e:
         return {"result": f"Unexpected error: {str(e)}"}
     
+
+
 @app.get("/api/practice/random")
-def get_random_question():
+def get_random_question(unit: str = Query(...)):
+    if unit not in questions_by_unit:
+        return {"error": f"Invalid unit category: {unit}"}
+
+    questions = questions_by_unit[unit]
     q_id = random.choice(list(questions.keys()))
     q = questions[q_id]
+
     return {
         "id": q_id,
-        "image": q["image"],                      # e.g. "/images/q1.png"
-        "num_answers": len(q["answers"])          # Needed to render number of input boxes
+        "image": q["image"],
+        "num_answers": len(q["answers"])
     }
+
 
 
 @app.post("/api/practice/validate")
 def validate_practice_answers(data: dict = Body(...)):
+    unit = data.get("unit")
     q_id = data.get("id")
     user_answers = data.get("answers", [])
 
-    if q_id not in questions:
-        return {"error": "Invalid question ID"}
+    if unit not in questions_by_unit:
+        return {"error": "Invalid unit category"}
 
-    correct_answers = questions[q_id]["answers"]
+    unit_questions = questions_by_unit[unit]
+
+    if q_id not in unit_questions:
+        return {"error": "Invalid question ID for this unit"}
+
+    correct_answers = unit_questions[q_id]["answers"]
     result = []
 
     for user, correct in zip(user_answers, correct_answers):
         try:
-            # Allow 5% tolerance
             result.append(abs(user - correct) / abs(correct) <= 0.05)
         except ZeroDivisionError:
             result.append(user == correct)
@@ -190,4 +205,37 @@ def validate_practice_answers(data: dict = Body(...)):
     return {
         "correct": result,
         "all_correct": all(result)
+    }
+
+
+@app.get("/api/practice/list_ids")
+def list_question_ids(unit: str):
+    # Assuming you store questions like questions_unitConversion, etc.
+    unit_map = {
+        "unitConversion": questions_unitConversion,
+        "firstLaw": questions_firstLaw,
+        # Add others
+    }
+    if unit not in unit_map:
+        return {"error": "Invalid unit"}
+    
+    question_ids = list(unit_map[unit].keys())
+    return {"ids": question_ids}
+
+
+@app.get("/api/practice/get_by_id")
+def get_question_by_id(id: str = Query(...), unit: str = Query(...)):
+    if unit not in questions_by_unit:
+        return {"error": f"Invalid unit category: {unit}"}
+
+    questions = questions_by_unit[unit]
+
+    if id not in questions:
+        return {"error": f"Invalid question ID: {id}"}
+
+    q = questions[id]
+    return {
+        "id": id,
+        "image": q["image"],
+        "num_answers": len(q["answers"])
     }
