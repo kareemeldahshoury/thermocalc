@@ -500,6 +500,21 @@ const response = await fetch(endpoint, {
     color: #000;
     border-radius: 12px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    font-family: system-ui, sans-serif;
+  }
+
+  .header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 27px;
+  }
+
+  .header-bar h2 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #7A0019;
+    margin: 0;
   }
 
   label {
@@ -507,14 +522,21 @@ const response = await fetch(endpoint, {
     display: block;
     margin-top: 42px;
     margin-bottom: 6px;
+    font-size: 1rem;
   }
 
   select {
-  width: 100%;
-  min-width: 300px;
-  padding: 10px;
-  font-size: 1rem;
-}
+    width: 100%;
+    min-width: 300px;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #f2f2f2;
+    color: black;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+  }
 
   input {
     width: 100%;
@@ -525,10 +547,11 @@ const response = await fetch(endpoint, {
     margin-bottom: 16px;
     color: black;
     background-color: #f2f2f2;
+    box-sizing: border-box;
   }
 
   button {
-    background-color: #7A0019; /* U of M Gold */
+    background-color: #7A0019;
     color: #ffffff;
     border: none;
     padding: 10px 20px;
@@ -537,10 +560,16 @@ const response = await fetch(endpoint, {
     border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    margin-top: 20px;
   }
 
   button:hover {
     background-color: #9c0033;
+  }
+
+  option {
+    white-space: normal;
+    max-width: 100%;
   }
 
   strong {
@@ -556,41 +585,21 @@ const response = await fetch(endpoint, {
     text-align: center;
   }
 
-th {
-  padding: 10px;
-  border: 1px solid #ddd;
-  text-align: center;
-  max-width: 150px;
-  white-space: normal;
-  word-wrap: break-word;
-}
+  thead {
+    background-color: #f7f7f7;
+  }
+
+  th {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+    max-width: 150px;
+    white-space: normal;
+    word-wrap: break-word;
+  }
 
   td {
     border: 1px solid #ddd;
     padding: 12px;
   }
-
-  thead {
-    background-color: #f7f7f7;
-  }
-
-  .header-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 27px;
-}
-
-.header-bar h2 {
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #7A0019; /* Maroon */
-  margin: 0;
-}
-
-option {
-  white-space: normal;
-  max-width: 100%;
-}
-
 </style>

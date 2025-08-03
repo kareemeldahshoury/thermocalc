@@ -1,10 +1,9 @@
 <script lang="ts">
   import TableCalculation from './tableCalculation.svelte';
   import ConversionCalc from './conversionCalc.svelte';
-  import PracticeProblems from './practiceProblems.svelte';
-
-
-
+  import PracticeProblems from './PracticeProblems.svelte';
+  import KeyEquationsThermo from './keyEquationsThermo.svelte';
+  import WorkCalculator from './workCalculator.svelte';
 
   let selectedCalculator = '';
   let query = '';
@@ -19,119 +18,109 @@
 </nav>
 
 <div class="logo-bar">
-  <img src="/images/Logo.png" alt="Thermo Solver" class="center-logo" />
+  <button class="logo-button" on:click={() => { selectedSubject = ''; selectedCalculator = ''; }}>
+    <img src="/images/Logo.png" alt="Thermo Solver" class="center-logo" />
+  </button>
 </div>
 
+
 <div class="subject-bar">
-  <button class="subject-tab">Thermodynamics</button>
-  <button class="subject-tab">Fluids</button>
-  <button class="subject-tab">Heat Transfer</button>
-  <button class="subject-tab">Combustion</button>
-  <button
-    class="subject-tab"
-    on:click={() => {
-      selectedSubject = 'howto';
-      selectedCalculator = '';
-    }}>
-    About Us
-  </button>
+  <button class="subject-tab" on:click={() => { selectedSubject = 'thermo'; selectedCalculator = ''; }}>Thermodynamics</button>
+  <button class="subject-tab" on:click={() => { selectedSubject = 'fluids'; selectedCalculator = ''; }}>Fluids</button>
+  <button class="subject-tab" on:click={() => { selectedSubject = 'heat'; selectedCalculator = ''; }}>Heat Transfer</button>
+  <button class="subject-tab" on:click={() => { selectedSubject = 'combustion'; selectedCalculator = ''; }}>Combustion</button>
+  <button class="subject-tab" on:click={() => { selectedSubject = 'howto'; selectedCalculator = ''; }}>About Us</button>
 </div>
 
 <div class="section-divider"></div>
 
 <div class="page">
   <div class="layout">
-    <nav class="sidebar">
-      <div class="button-group">
-        <button
-          class:selected={selectedCalculator === 'calc1'}
-          on:click={() => {
-            selectedCalculator = 'calc1';
-            selectedSubject = '';
-          }}>
-          Conversion Calculator
-        </button>
+    {#if selectedSubject === 'thermo'}
+      <nav class="sidebar">
+        <div class="button-group">
+          <button
+            class:selected={selectedCalculator === 'calc1'}
+            on:click={() => { selectedCalculator = 'calc1'; }}>
+            Conversion Calculator
+          </button>
 
-        <button
-          class:selected={selectedCalculator === 'calc2'}
-          on:click={() => {
-            selectedCalculator = 'calc2';
-            selectedSubject = '';
-          }}>
-          Table Search
-        </button>
+          <button
+            class:selected={selectedCalculator === 'calc2'}
+            on:click={() => { selectedCalculator = 'calc2'; }}>
+            Table Search
+          </button>
 
-        <button
-          class:selected={selectedCalculator === 'calc3'}
-          on:click={() => {
-            selectedCalculator = 'calc3';
-            selectedSubject = '';
-          }}>
-          Calculator 3
-        </button>
+          <button
+            class:selected={selectedCalculator === 'calc3'}
+            on:click={() => { selectedCalculator = 'calc3'; }}>
+            Work Process Calculator
+          </button>
 
-        <button
-          class:selected={selectedCalculator === 'calc4'}
-          on:click={() => {
-            selectedCalculator = 'calc4';
-            selectedSubject = '';
-          }}>
-          Calculator 4
-        </button>
+          <button
+            class:selected={selectedCalculator === 'calc4'}
+            on:click={() => { selectedCalculator = 'calc4'; }}>
+            Calculator 4
+          </button>
 
-        <button
-          class:selected={selectedCalculator === 'calc5'}
-          on:click={() => {
-          selectedCalculator = 'calc5';
-          selectedSubject = '';
-        }}>
-        Practice Problems
-      </button>
+          <button
+            class:selected={selectedCalculator === 'calc5'}
+            on:click={() => { selectedCalculator = 'calc5'; }}>
+            Practice Problems
+          </button>
 
-      </div>
-    </nav>
+          <button
+            class:selected={selectedCalculator === 'calc6'}
+            on:click={() => { selectedCalculator = 'calc6'; }}>
+            Key Equations
+          </button>
+        </div>
+      </nav>
+    {/if}
 
     <main class="main-content">
       {#if selectedSubject === 'howto'}
         <div class="howto-content">
-  <h2>About Us</h2>
-  <p>
-    Thermo Solver was created with one mission: to make the lives of students and engineers easier.
-    We know how frustrating it can be to flip through tables, switch between unit systems, and calculate
-    thermodynamic properties by hand. Our goal is to centralize everything into one easy-to-use platform,
-    built by students, for students.
-  </p>
+          <h2>About Us</h2>
+          <p>
+            Thermo Solver was created with one mission: to make the lives of students and engineers easier.
+            We know how frustrating it can be to flip through tables, switch between unit systems, and calculate
+            thermodynamic properties by hand. Our goal is to centralize everything into one easy-to-use platform,
+            built by students, for students.
+          </p>
 
-  <h2>How to Use</h2>
-  <p>
-    Thermo Solver is a toolkit for engineering thermodynamics, fluid mechanics, and heat transfer calculations.
-    Here's how to get started:
-  </p>
-  <ul>
-    <li><strong>Sidebar Tools</strong>: Use the panel on the left to access calculators and property tables.</li>
-    <li><strong>Conversion Calculator</strong>: Convert between common units quickly and accurately.</li>
-    <li><strong>Table Search</strong>: Look up thermodynamic properties of fluids using real data.</li>
-    <li><strong>Calculator 3 & 4</strong>: These sections will offer advanced tools in future updates.</li>
-    <li><strong>Practice Problems</strong>: Improve and test your knowledge on various thermodynamics subjects.</li>
-  </ul>
-  <p>
-    You can also use the subject tabs at the top to filter tools by topic — such as Thermodynamics, Fluids, or Combustion —
-    to help tailor the experience to your coursework or project.
-  </p>
-</div>
+          <h2>How to Use</h2>
+          <p>
+            Thermo Solver is a toolkit for engineering thermodynamics, fluid mechanics, and heat transfer calculations.
+            Here's how to get started:
+          </p>
+          <ul>
+            <li><strong>Sidebar Tools</strong>: Use the panel on the left to access calculators and property tables.</li>
+            <li><strong>Conversion Calculator</strong>: Convert between common units quickly and accurately.</li>
+            <li><strong>Table Search</strong>: Look up thermodynamic properties of fluids using real data.</li>
+            <li><strong>Calculator 3 & 4</strong>: These sections will offer advanced tools in future updates.</li>
+            <li><strong>Practice Problems</strong>: Improve and test your knowledge on various thermodynamics subjects.</li>
+          </ul>
+          <p>
+            You can also use the subject tabs at the top to filter tools by topic — such as Thermodynamics, Fluids, or Combustion —
+            to help tailor the experience to your coursework or project.
+          </p>
+        </div>
 
       {:else if selectedCalculator === 'calc1'}
         <ConversionCalc />
       {:else if selectedCalculator === 'calc2'}
         <TableCalculation />
       {:else if selectedCalculator === 'calc3'}
-        <p>Calculator 3 coming soon...</p>
+        <WorkCalculator />
       {:else if selectedCalculator === 'calc4'}
         <p>Calculator 4 coming soon...</p>
       {:else if selectedCalculator === 'calc5'}
-      <PracticeProblems />
+        <PracticeProblems />
+      {:else if selectedCalculator === 'calc6'}
+        <KeyEquationsThermo />
       {:else}
-        <p>Select a calculator from the left.</p>
+        <p>Select a subject and calculator to get started.</p>
       {/if}
     </main>
   </div>
@@ -327,5 +316,17 @@
   margin-bottom: 10px;
   font-size: 0.98rem;
 }
+
+.logo-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.logo-button:focus {
+  outline: none;
+}
+
 
 </style>

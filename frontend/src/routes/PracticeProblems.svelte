@@ -7,9 +7,9 @@
 
   let availableUnits = [
     { id: 'unitConversion', label: 'Unit Conversion' },
-    { id: 'firstLaw', label: 'First Law Practice' },
-    { id: 'heat-transfer', label: 'Heat Transfer' },
-    { id: 'propulsion', label: 'Propulsion' }
+    { id: 'firstLaw', label: 'First Law' },
+    { id: 'secondLaw', label: 'Second Law' },
+    { id: 'refrigeration', label: 'Refrigeration' }
   ];
 
   let selectedUnit: string | null = null;
@@ -125,7 +125,7 @@ function startOver() {
 
 <div class="practice-container">
   {#if !selectedUnit}
-    <h2>Select a Unit</h2>
+    <h2 style="font-weight: bold;">Select a Unit</h2>
     <div class="unit-buttons">
       {#each availableUnits as unit}
         <button on:click={() => selectUnit(unit.id)}>{unit.label}</button>
@@ -194,6 +194,10 @@ function startOver() {
     box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
   }
 
+  h2 {
+    text-align: center;
+  }
+
   .unit-buttons {
     display: flex;
     flex-wrap: wrap;
@@ -230,8 +234,9 @@ function startOver() {
   }
 
   .top-bar h2 {
-    color: #7A0019;
+    color: black;
     margin: 0;
+    font-weight: bold
   }
 
  .image-box {

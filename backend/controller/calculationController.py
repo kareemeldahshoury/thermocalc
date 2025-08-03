@@ -7,6 +7,7 @@ from backend.core.calculations.specHeat import specHeatCalculation
 from backend.core.calculations.idealGasCalculation import IdealGasProperties
 from backend.core.calculations.saturatedFluidsCalc import SaturatedFluidCalculation
 from backend.core.calculations.unitConversion import UnitConverter
+from backend.core.calculations.workCalculation import calculate_work
 
     
 def handle_calculation_superHeatedWater(fluid_type: str, substance: str, inputs: dict):
@@ -42,3 +43,6 @@ def handle_calculation_saturatedFluid(fluid_type: str, inputs: dict):
 
 def handle_unit_conversion(from_unit: str, to_unit: str, value: float) -> float:
     return UnitConverter.convert(value, from_unit, to_unit)
+
+def handle_calculation_workProcess(process: str, inputs: dict):
+    return calculate_work(process, inputs)
