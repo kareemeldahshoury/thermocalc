@@ -2,7 +2,6 @@
   import TableCalculation from './tableCalculation.svelte';
   import ConversionCalc from './conversionCalc.svelte';
   import PracticeProblems from './PracticeProblems.svelte';
-  import KeyEquationsThermo from './keyEquationsThermo.svelte';
   import WorkCalculator from './workCalculator.svelte';
 
   let selectedCalculator = '';
@@ -118,7 +117,7 @@
       {:else if selectedCalculator === 'calc5'}
         <PracticeProblems />
       {:else if selectedCalculator === 'calc6'}
-        <KeyEquationsThermo />
+      <p> test </p>
       {:else}
         <p>Select a subject and calculator to get started.</p>
       {/if}

@@ -1,10 +1,16 @@
 <script lang="ts">
+
+ import ProcessInfo from "./processInfo.svelte";
+
+    
   let selectedProcess: string = '';
   let selectedEquation: string = '';
   let inputValues: Record<string, string> = {};
   let resultMessage: string | Record<string, number> = '';
   let lastInputs: Record<string, string> = {};
   let lastProcess: string = '';
+  let showProcessInfo = false;
+
 
   const processOptions = [
     { id: 'Isobaric', label: 'Isobaric Process' },
@@ -205,97 +211,115 @@
   return subscriptMap[id] || id;
 }
 
+function toggleProcessInfo() {
+  showProcessInfo = !showProcessInfo;
+}
+
+
 </script>
 
-<div class="container">
-  <div class="header-row">
-  <h2>Thermodynamic Work Calculator</h2>
-</div>
+{#if showProcessInfo}
+  <ProcessInfo />
+  <div class="top-right-btn">
+    <button class="nav-btn" on:click={() => showProcessInfo = false}>
+      Back to Calculator
+    </button>
+  </div>
+{:else}
+  <div class="container">
+    <div class="header-row">
+      <h2>Thermodynamic Work Calculator</h2>
+    </div>
 
-<div class="button-wrapper">
-  <button class="top-right-button">Processes Information</button>
-</div>
+    <div class="button-wrapper">
+      <button class="top-right-button" on:click={toggleProcessInfo}>
+      Processes Information
+      </button>
+    </div>
 
 
-  <label for="process">Select Thermodynamic Process:</label>
-  <select
-  id="process"
-  bind:value={selectedProcess}
-  on:change={() => {
-    selectedEquation = '';
-    resultMessage = '';
-    lastInputs = {};
-    lastProcess = '';
-    inputValues = {};
-  }}
->
-    <option value="">-- Select a process --</option>
-    {#each processOptions as process}
-      <option value={process.id}>{process.label}</option>
-    {/each}
-  </select>
-
-  {#if selectedProcess}
-    <label for="equation">Select Equation:</label>
-    <div class="equation-buttons">
-      {#each processEquations[selectedProcess] as equation}
-        <button
-  type="button"
-  class:selected={selectedEquation === equation.id}
-  on:click={() => {
-    selectedEquation = equation.id;
-    resultMessage = '';
-    lastInputs = {};
-    lastProcess = '';
-  }}
->
-          {@html equation.label}
-        </button>
+    <label for="process">Select Thermodynamic Process:</label>
+    <select
+      id="process"
+      bind:value={selectedProcess}
+      on:change={() => {
+        selectedEquation = '';
+        resultMessage = '';
+        lastInputs = {};
+        lastProcess = '';
+        inputValues = {};
+      }}
+    >
+      <option value="">-- Select a process --</option>
+      {#each processOptions as process}
+        <option value={process.id}>{process.label}</option>
       {/each}
-    </div>
-  {/if}
+    </select>
 
-  {#if selectedEquation && equationInputs[selectedProcess]?.[selectedEquation]}
-    {#each equationInputs[selectedProcess][selectedEquation] as input}
-      <label for={input.id}>{@html input.label}:</label>
-      <input
-        id={input.id}
-        type="text"
-        bind:value={inputValues[input.id]}
-        placeholder={`Enter ${formatPlaceholder(input.id)}`}
-      />
-    {/each}
+    {#if selectedProcess}
+      <label for="equation">Select Equation:</label>
+      <div class="equation-buttons">
+        {#each processEquations[selectedProcess] as equation}
+          <button
+            type="button"
+            class:selected={selectedEquation === equation.id}
+            on:click={() => {
+              selectedEquation = equation.id;
+              resultMessage = '';
+              lastInputs = {};
+              lastProcess = '';
+            }}
+          >
+            {@html equation.label}
+          </button>
+        {/each}
+      </div>
+    {/if}
 
-    <button class="calculate-btn" on:click={calculateFrontend}>Calculate Work</button>
-  {/if}
+    {#if selectedEquation && equationInputs[selectedProcess]?.[selectedEquation]}
+      {#each equationInputs[selectedProcess][selectedEquation] as input}
+        <label for={input.id}>{@html input.label}:</label>
+        <input
+          id={input.id}
+          type="text"
+          bind:value={inputValues[input.id]}
+          placeholder={`Enter ${formatPlaceholder(input.id)}`}
+        />
+      {/each}
 
-  {#if resultMessage}
-    <div class="result-info">
-      <strong>Result for {lastProcess} Process:</strong>
-      {#if typeof resultMessage === 'object' && resultMessage !== null}
-        <table>
-          <thead>
-            <tr>
-              {#each Object.entries(resultMessage) as [key, _]}
-                <th>{key}</th>
-              {/each}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              {#each Object.entries(resultMessage) as [_, value]}
-                <td>{(value / 1000).toFixed(4)} kJ</td>
-              {/each}
-            </tr>
-          </tbody>
-        </table>
-      {:else}
-        <p class="error-message">{resultMessage}</p>
-      {/if}
-    </div>
-  {/if}
-</div>
+      <button class="calculate-btn" on:click={calculateFrontend}>Calculate Work</button>
+    {/if}
 
+    {#if resultMessage}
+      <div class="result-info">
+        <strong>Result for {lastProcess} Process:</strong>
+        {#if typeof resultMessage === 'object' && resultMessage !== null}
+          <table>
+            <thead>
+              <tr>
+                {#each Object.entries(resultMessage) as [key, _]}
+                  <th>{key}</th>
+                {/each}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                {#each Object.entries(resultMessage) as [_, value]}
+                  <td>{(value / 1000).toFixed(4)} kJ</td>
+                {/each}
+              </tr>
+            </tbody>
+          </table>
+        {:else}
+          <p class="error-message">{resultMessage}</p>
+        {/if}
+      </div>
+    {/if}
+  </div>
+{/if}
+
+
+ 
 
 <style>
   :global(body) {
@@ -327,7 +351,7 @@ h2 {
 label {
   display: block;
   font-size: 1.05rem;
-  margin-top: 34px;
+  margin-top: 38px;
   color: #222;
   font-weight: 700
 }
@@ -389,7 +413,7 @@ input:disabled {
     border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    margin-top: 40px;
+    margin-top: 35px;
 }
 
 .calculate-btn:hover {
@@ -443,14 +467,25 @@ th {
   background-color: #7A0019;
   color: white;
   border: none;
-  padding: 8px 16px;
-  font-size: 0.95rem;
+  padding: 8px 14px;
+  font-size: .88rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: -33px
+}
+
+.nav-btn {
+  background-color: #7A0019;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  font-size: 1rem;
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s;
-  margin-top: -32px
+  margin-top: -32px;
+  margin-left: 750px
 }
-
-
 
 </style>

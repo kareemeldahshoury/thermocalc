@@ -205,7 +205,7 @@
   label {
     font-weight: bold;
     display: block;
-    margin-top: 40px;
+    margin-top: 42px;
     margin-bottom: 6px;
   }
 
