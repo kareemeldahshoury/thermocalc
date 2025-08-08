@@ -71,7 +71,7 @@ onMount(() => {
 
 <div class="carousel-banner">
   {#if slides[currentSlide].type === 'logo'}
-    <img src="/images/Logo.png" alt="Thermo Solver" class="carousel-logo" />
+    <img src="/images/Logo2.png" alt="Thermo Solver" class="carousel-logo" />
   {:else}
     <h1>{slides[currentSlide].title}</h1>
     <p>{slides[currentSlide].subtitle}</p>
@@ -356,11 +356,12 @@ onMount(() => {
 
 
 .carousel-logo {
-  height: 120px;
-  max-width: 80%;
-  margin: 0 auto 20px auto; 
-  display: block; 
+  height: 120px;       /* Or increase further */
+  max-width: none;     /* Remove width restriction */
+  margin: 0 auto 20px auto;
+  display: block;
 }
+
 
 
 .carousel-banner h1 {
