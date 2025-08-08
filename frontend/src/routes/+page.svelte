@@ -3,24 +3,98 @@
   import ConversionCalc from './conversionCalc.svelte';
   import PracticeProblems from './PracticeProblems.svelte';
   import WorkCalculator from './workCalculator.svelte';
+  import { onMount } from 'svelte';
+
 
   let selectedCalculator = '';
   let query = '';
   let selectedSubject = '';
+
+  let currentSlide = 0;
+ const slides = [
+  {
+    type: 'logo',
+    title: '',
+    subtitle: '',
+    cta: '',
+    targetCalculator: ''
+  },
+  {
+    title: 'Search Thermodynamics Tables Instantly',
+    subtitle: 'Quick, accurate results for students and engineers',
+    cta: 'Try the Tables Calculator',
+    targetCalculator: 'calc2'
+  },
+  {
+    title: 'Master Work Equations',
+    subtitle: 'Adiabatic, polytropic, isothermal, and more',
+    cta: 'Try the Work Calculator',
+    targetCalculator: 'calc3'
+  }
+];
+
+let interval: ReturnType<typeof setInterval> | null = null;
+
+function startCarousel() {
+  if (!interval) {
+    interval = setInterval(() => {
+      if (!selectedSubject && !selectedCalculator) {
+        currentSlide = (currentSlide + 1) % slides.length;
+      }
+    }, 5000);
+  }
+}
+
+function stopCarousel() {
+  if (interval) {
+    clearInterval(interval);
+    interval = null;
+    currentSlide = 0;
+  }
+}
+
+$: {
+  if (selectedSubject || selectedCalculator) {
+    stopCarousel();
+    currentSlide = 0;
+  } else {
+    startCarousel();
+  }
+}
+
+onMount(() => {
+  startCarousel();
+});
 </script>
 
-<nav class="topbar">
-  <div class="nav-buttons">
-    <button class="mode-btn">Login</button>
-    <button class="mode-btn secondary">Learning Center</button>
-  </div>
-</nav>
 
-<div class="logo-bar">
-  <button class="logo-button" on:click={() => { selectedSubject = ''; selectedCalculator = ''; }}>
-    <img src="/images/Logo.png" alt="Thermo Solver" class="center-logo" />
-  </button>
+
+<div class="carousel-banner">
+  {#if slides[currentSlide].type === 'logo'}
+    <img src="/images/Logo.png" alt="Thermo Solver" class="carousel-logo" />
+  {:else}
+    <h1>{slides[currentSlide].title}</h1>
+    <p>{slides[currentSlide].subtitle}</p>
+    {#if slides[currentSlide].cta}
+      <button
+        class="cta-btn"
+        disabled={!!(selectedSubject || selectedCalculator)}
+        on:click={() => {
+          const calc = slides[currentSlide].targetCalculator;
+          if (calc && !selectedCalculator && !selectedSubject) {
+            selectedSubject = 'thermo';
+            selectedCalculator = calc;
+            document.querySelector('.main-content')?.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
+      >
+        {slides[currentSlide].cta}
+      </button>
+    {/if}
+  {/if}
 </div>
+
+
 
 
 <div class="subject-bar">
@@ -32,6 +106,7 @@
 </div>
 
 <div class="section-divider"></div>
+
 
 <div class="page">
   <div class="layout">
@@ -119,7 +194,7 @@
       {:else if selectedCalculator === 'calc6'}
       <p> test </p>
       {:else}
-        <p>Select a subject and calculator to get started.</p>
+        <p></p>
       {/if}
     </main>
   </div>
@@ -140,53 +215,7 @@
   height: 100vh;
 }
 
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 60px;
-  padding: 0 24px;
-  background: #7A0019;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
 
-.logo-bar {
-  background-color: #7A0019;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px 0;
-}
-
-.center-logo {
-  height: 80px;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-  display: block;
-}
-
-.nav-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.mode-btn {
-  background: #ffeed6;
-  border: 1px solid #f78b00;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.mode-btn.secondary {
-  border-color: #888;
-  background: #f3f3f3;
-}
 
 .layout {
   display: flex;
@@ -316,16 +345,51 @@
   font-size: 0.98rem;
 }
 
-.logo-button {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
+
+.carousel-banner {
+  background: linear-gradient(to right, #7A0019, #f78b00);
+  padding: 20px 10px;
+  text-align: center;
+  color: white;
+  transition: all 0.6s ease-in-out;
 }
 
-.logo-button:focus {
-  outline: none;
+
+.carousel-logo {
+  height: 120px;
+  max-width: 80%;
+  margin: 0 auto 20px auto; 
+  display: block; 
 }
+
+
+.carousel-banner h1 {
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.carousel-banner p {
+  font-size: clamp(0.95rem, 1.6vw, 1.05rem);
+  margin-bottom: 20px;
+}
+
+.cta-btn {
+  background: white;
+  color: #7A0019;
+  font-weight: bold;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1rem;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.cta-btn:hover {
+  background: #f3f3f3;
+}
+
 
 
 </style>
