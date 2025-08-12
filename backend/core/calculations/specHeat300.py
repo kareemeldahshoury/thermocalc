@@ -15,7 +15,7 @@ idealGas300K_data = {
     "nitrogen": ["N₂", 0.2968, 1.0390, 0.7430, 1.400],
     "octane": ["C₈H₁₈", 0.0729, 1.7113, 1.6385, 1.044],
     "oxygen": ["O₂", 0.2598, 0.918, 0.658, 1.395],
-    "propane": ["C₃H₈", 0.1885, 1.7994, 1.4990, 1.126],
+    "propane": ["C₃H₈", 0.1885, 1.6794, 1.4909, 1.126],
     "steam": ["H₂O", 0.4615, 1.8723, 1.4108, 1.327],
 }
 
@@ -26,9 +26,10 @@ def idealGas300KCalculation(substance: str) -> Dict[str, str | float]:
     formula, R, cp, cv, k = idealGas300K_data[substance]
     return {
         "Substance": substance.replace("_", " ").title(),
-        "Formula": formula,
-        "Gas Constant R (kJ/kg·K)": R,
-        "Specific Heat cₚ (kJ/kg·K)": cp,
-        "Specific Heat cᵥ (kJ/kg·K)": cv,
-        "Ratio of Specific Heats (k)": k
+"Formula": formula,
+"Gas Constant<br>(<em>R</em>, kJ/kg·K)": R,
+"Specific Heat<br>(<em>cₚ</em>, kJ/kg·K)": cp,
+"Specific Heat<br>(<em>cᵥ</em>, kJ/kg·K)": cv,
+"Ratio of Specific Heats<br>(<em>k</em>)": k
+
     }

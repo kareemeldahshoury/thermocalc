@@ -1,5 +1,7 @@
 from typing import Dict
 
+# finished number check
+
 molGCP_data = {
     "air": ["—", 28.97, 0.2870, 132.5, 3.77, 0.0883],
     "ammonia": ["NH₃", 17.03, 0.4882, 405.5, 11.28, 0.0724],
@@ -47,7 +49,7 @@ def molGCPCalculation(substance: str) -> Dict[str, str | float]:
     "Substance<br>": substance.replace("_", " ").title(),
     "Formula<br>": formula,
     "Molar Mass<br>(kg/kmol)": M,
-    "Gas Constant<br>R (kJ/kg·K)": R,
+    "Gas Constant<br> (R, kJ/kg·K)": R,
     "Critical Temp<br>(Tₛ, K)": T_crit,
     "Critical Pressure<br>(Pₛ, MPa)": P_crit,
     "Critical Volume<br>(Vₛ, m³/kmol)": V_crit

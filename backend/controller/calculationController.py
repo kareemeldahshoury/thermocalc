@@ -1,3 +1,4 @@
+from typing import Any, Dict
 from backend.service.superHeatedWaterService import sh_water
 from backend.service.idealAirService import idealAirCalculation
 from backend.service.superheatedR134Service import sh_134a
@@ -8,6 +9,8 @@ from backend.core.calculations.idealGasCalculation import IdealGasProperties
 from backend.core.calculations.saturatedFluidsCalc import SaturatedFluidCalculation
 from backend.core.calculations.unitConversion import UnitConverter
 from backend.core.calculations.workCalculation import calculate_work
+from backend.core.calculations.generalEquations import get_general_solver
+
 
     
 def handle_calculation_superHeatedWater(fluid_type: str, substance: str, inputs: dict):
@@ -46,3 +49,8 @@ def handle_unit_conversion(from_unit: str, to_unit: str, value: float) -> float:
 
 def handle_calculation_workProcess(process: str, inputs: dict):
     return calculate_work(process, inputs)
+
+
+def handle_calculation_general(equation_id: str, solve_for: str, inputs: Dict[str, float]) -> Any:
+    solver = get_general_solver(equation_id)
+    return solver(solve_for, inputs)

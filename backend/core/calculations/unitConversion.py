@@ -20,7 +20,12 @@ class UnitConverter:
 
         # Velocity (base: m/s)
         "Kilometers per Hour (km/h)": 1 / 3.6,
-        "Miles per Hour (mile/h)": 0.44704,
+"Miles per Hour (mile/h)": 0.44704,
+"Meters per Second (m/s)": 1,
+"Feet per Second (ft/s)": 0.3048,
+"Knots (kn)": 0.514444,
+"Mach (at 20°C)": 343.2,   
+"Feet per Minute (ft/min)": 0.00508,
 
         # Volume (base: m³)
         "Cubic Meters (m³)": 1,

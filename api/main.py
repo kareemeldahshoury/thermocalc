@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.models.calculationRequest import CalculationRequest
 from backend.controller.calculationController import ( handle_calculation_superHeatedWater, handle_calculation_idealAir,
 handle_calculation_superheated134, handle_calculation_molGCP, handle_calculation_specHeat300, handle_calculation_specHeat, handle_calculation_idealGas, handle_calculation_saturatedFluid,
-handle_unit_conversion, handle_calculation_workProcess)
+handle_unit_conversion, handle_calculation_general)
 from pydantic import BaseModel
 from typing import Union
 from backend.models.unitConversionModel import UnitConversionRequest
@@ -14,6 +14,7 @@ import random
 from fastapi import Body
 from fastapi import APIRouter, Query
 from backend.core.calculations.questions import (questions_firstLaw, questions_unitConversion)
+from typing import Dict
 
 app = FastAPI()
 
@@ -27,6 +28,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class GeneralSolveRequest(BaseModel):
+    equationId: str
+    solveFor: str
+    inputs:Dict[str, float]
 
 @app.post("/api/calculate/superHeatedWater")
 def calculate_superHeatedWater(req: CalculationRequest):
@@ -240,3 +247,17 @@ def get_question_by_id(id: str = Query(...), unit: str = Query(...)):
         "num_answers": len(q["answers"])
     }
 
+
+@app.post("/api/calculate/general")
+def calculate_general(req: GeneralSolveRequest):
+    try:
+        result = handle_calculation_general(
+            equation_id=req.equationId,
+            solve_for=req.solveFor,
+            inputs=req.inputs
+        )
+        return {"result": result}
+    except ValueError as e:
+        return {"result": f"Error: {str(e)}"}
+    except Exception as e:
+        return {"result": f"Unexpected error: {str(e)}"}

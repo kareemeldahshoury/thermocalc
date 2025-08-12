@@ -171,6 +171,7 @@ const specHeat = [
 $: if (selectedFluid !== previousFluid) {
   inputValues = {};
   resultMessage = '';
+  frozenInputs = {};
   if (!selectedFluid.startsWith('ideal') && selectedFluid !== 'specHeat') {
     selectedSubstance = '';
   }
@@ -178,6 +179,8 @@ $: if (selectedFluid !== previousFluid) {
 }
 
   let inputValues: Record<string, string> = {};
+  let frozenInputs: Record<string, string> = {};
+
 
  
   let resultMessage = '';
@@ -292,7 +295,7 @@ if (selectedFluid.includes('Sat')) {
     inputs: inputValues
   };
 
-  // ✅ Add substance only when needed
+
   if (
     selectedFluid.includes('ideal') ||
     selectedFluid === 'molGCP' ||
@@ -315,6 +318,8 @@ const response = await fetch(endpoint, {
 
     const result = await response.json();
     resultMessage = result.result;
+    frozenInputs = { ...inputValues };
+
 
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -345,7 +350,11 @@ const response = await fetch(endpoint, {
     const match = fluidOptions.find(f => f.label === searchText);
     if (match) selectedFluid = match.id;
   }}
+  on:focus={(e) => (e.target as HTMLInputElement).select()}
+  class="fluid-input"
 />
+
+
 
 <datalist id="fluidOptions">
   {#each fluidOptions as fluid}
@@ -400,7 +409,13 @@ const response = await fetch(endpoint, {
 {:else if selectedFluid && selectedFluid in fluidInputs}
   <div>
     {#each fluidInputs[selectedFluid as FluidType] as input}
-      <label for={input.id}>{@html input.label}:</label>
+      <label for={input.id}>
+  {@html input.label.split('<i>')[0]}
+  <span style="font-size: 0.85em; color: #555;">
+    {input.label.includes('<i>') ? input.label.split('<i>')[1].replace('</i>', '') : ''}
+  </span>
+</label>
+
       <input
         id={input.id}
         type="text"
@@ -413,7 +428,13 @@ const response = await fetch(endpoint, {
 {:else if selectedFluid && fluidInputs[selectedFluid]}
   <div>
     {#each fluidInputs[selectedFluid] as input}
-      <label for={input.id}>{@html input.label}:</label>
+      <label for={input.id}>
+  {@html input.label.split('<i>')[0]}
+  <span style="font-size: 0.85em; color: #555;">
+    {input.label.includes('<i>') ? input.label.split('<i>')[1].replace('</i>', '') : ''}
+  </span>
+</label>
+
       <input
         id={input.id}
         type="text"
@@ -432,20 +453,20 @@ const response = await fetch(endpoint, {
 {#if resultMessage}
   <div style="margin-top: 20px;">
 <strong>
-  Result: {getFluidLabel(selectedFluid)}
-  {#if inputValues.temperature || inputValues.pressure || inputValues.quality}
-    &nbsp;(
-    {#if inputValues.temperature}
-      T = {inputValues.temperature} {selectedFluid.includes('ideal') ? 'K' : '°C'}{(inputValues.pressure || inputValues.quality) ? ', ' : ''}
-    {/if}
-    {#if inputValues.pressure}
-      P = {inputValues.pressure} bar{inputValues.quality ? ', ' : ''}
-    {/if}
-    {#if inputValues.quality}
-      x = {inputValues.quality}
-    {/if}
-    )
+  {getFluidLabel(selectedFluid)}
+  {#if frozenInputs.temperature || frozenInputs.pressure || frozenInputs.quality}
+  &nbsp;(
+  {#if frozenInputs.temperature}
+    T = {frozenInputs.temperature} {selectedFluid.includes('ideal') ? 'K' : '°C'}{(frozenInputs.pressure || frozenInputs.quality) ? ', ' : ''}
   {/if}
+  {#if frozenInputs.pressure}
+    P = {frozenInputs.pressure} bar{frozenInputs.quality ? ', ' : ''}
+  {/if}
+  {#if frozenInputs.quality}
+    x = {frozenInputs.quality}
+  {/if}
+  )
+{/if}
 </strong>
 
 

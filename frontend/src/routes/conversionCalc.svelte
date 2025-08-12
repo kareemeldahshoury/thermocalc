@@ -32,9 +32,14 @@
       "Feet (ft)",
     ],
     Velocity: [
-      "Kilometers per Hour (km/h)",
-      "Miles per Hour (mile/h)"
-    ],
+  "Kilometers per Hour (km/h)",
+  "Miles per Hour (mile/h)",
+  "Meters per Second (m/s)",
+  "Feet per Second (ft/s)",
+  "Knots (kn)",
+  "Mach (at 20°C)",
+  "Feet per Minute (ft/min)"
+],
     Volume: [
       "Cubic Centimeters (cm³)",
       "Cubic Meters (m³)",

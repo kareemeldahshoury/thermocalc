@@ -4,6 +4,8 @@
   import PracticeProblems from './PracticeProblems.svelte';
   import WorkCalculator from './workCalculator.svelte';
   import { onMount } from 'svelte';
+  import OtherEquations from './otherEquations.svelte';
+
 
 
   let selectedCalculator = '';
@@ -70,9 +72,18 @@ onMount(() => {
 
 
 <div class="carousel-banner">
-  {#if slides[currentSlide].type === 'logo'}
+ {#if slides[currentSlide].type === 'logo'}
+  <button
+    class="logo-button"
+    on:click={() => {
+      selectedSubject = '';
+      selectedCalculator = '';
+      currentSlide = 0;
+    }}
+  >
     <img src="/images/Logo2.png" alt="Thermo Solver" class="carousel-logo" />
-  {:else}
+  </button>
+{:else}
     <h1>{slides[currentSlide].title}</h1>
     <p>{slides[currentSlide].subtitle}</p>
     {#if slides[currentSlide].cta}
@@ -98,7 +109,7 @@ onMount(() => {
 
 
 <div class="subject-bar">
-  <button class="subject-tab" on:click={() => { selectedSubject = 'thermo'; selectedCalculator = ''; }}>Thermodynamics</button>
+  <button class="subject-tab" on:click={() => { selectedSubject = 'thermo'; selectedCalculator = 'calc1'; }}>Thermodynamics</button>
   <button class="subject-tab" on:click={() => { selectedSubject = 'fluids'; selectedCalculator = ''; }}>Fluids</button>
   <button class="subject-tab" on:click={() => { selectedSubject = 'heat'; selectedCalculator = ''; }}>Heat Transfer</button>
   <button class="subject-tab" on:click={() => { selectedSubject = 'combustion'; selectedCalculator = ''; }}>Combustion</button>
@@ -134,7 +145,7 @@ onMount(() => {
           <button
             class:selected={selectedCalculator === 'calc4'}
             on:click={() => { selectedCalculator = 'calc4'; }}>
-            Calculator 4
+            General Equations
           </button>
 
           <button
@@ -172,7 +183,7 @@ onMount(() => {
             <li><strong>Sidebar Tools</strong>: Use the panel on the left to access calculators and property tables.</li>
             <li><strong>Conversion Calculator</strong>: Convert between common units quickly and accurately.</li>
             <li><strong>Table Search</strong>: Look up thermodynamic properties of fluids using real data.</li>
-            <li><strong>Calculator 3 & 4</strong>: These sections will offer advanced tools in future updates.</li>
+            <li><strong>Work Calculator</strong>: Solve for work from any of the thermodynamic processes.</li>
             <li><strong>Practice Problems</strong>: Improve and test your knowledge on various thermodynamics subjects.</li>
           </ul>
           <p>
@@ -188,7 +199,7 @@ onMount(() => {
       {:else if selectedCalculator === 'calc3'}
         <WorkCalculator />
       {:else if selectedCalculator === 'calc4'}
-        <p>Calculator 4 coming soon...</p>
+        <OtherEquations />
       {:else if selectedCalculator === 'calc5'}
         <PracticeProblems />
       {:else if selectedCalculator === 'calc6'}
@@ -352,14 +363,17 @@ onMount(() => {
   text-align: center;
   color: white;
   transition: all 0.6s ease-in-out;
+  height: 190px;
+  overflow: hidden
 }
 
 
 .carousel-logo {
-  height: 120px;       /* Or increase further */
-  max-width: none;     /* Remove width restriction */
+  height: 110px; 
+  max-width: none;     
   margin: 0 auto 20px auto;
   display: block;
+  margin-top: 10px;
 }
 
 
@@ -389,6 +403,17 @@ onMount(() => {
 
 .cta-btn:hover {
   background: #f3f3f3;
+}
+
+.logo-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.logo-button:focus {
+  outline: none;
 }
 
 
