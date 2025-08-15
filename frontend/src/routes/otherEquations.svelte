@@ -3,7 +3,6 @@
   type VarDef = { id: string; label: string; placeholder?: string };
   type EqDef = { id: string; title: string; variables: VarDef[] };
 
-  // ---------- Equations list (UI only) ----------
   const EQUATIONS: EqDef[] = [
     {
       id: 'refEfficency',
@@ -131,30 +130,64 @@ function symbolFor(eqId: string, varId: string): string {
       inputs: payloadInputs
     };
 
-    try {
-      const res = await fetch('http://localhost:8000/api/calculate/general', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error((await res.text()) || 'Server error');
+try {
+  const res = await fetch('http://localhost:8000/api/calculate/general', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
 
-      const data = await res.json();
+  const raw = await res.text();
+  let data: any = null;
+  try { data = raw ? JSON.parse(raw) : null; } catch { /* raw is plain text */ }
 
-      if (typeof data === 'number') {
-        resultMessage = data;
-      } else if ('value' in (data as any)) {
-        const v = (data as any).value;
-        const u = (data as any).unit ? ` ${(data as any).unit}` : '';
-        resultMessage = `${v}${u}`;
-      } else if ('result' in (data as any)) {
-        resultMessage = (data as any).result;
-      } else {
-        resultMessage = data;
-      }
-    } catch (e: any) {
-      errorMsg = e?.message ?? 'Unknown error';
-    }
+  if (!res.ok) {
+    const msg =
+      (data && (data.detail || data.error || data.message)) ||
+      raw ||
+      'Server error';
+    errorMsg = msg;
+    return;
+  }
+
+
+  if (typeof data === 'number') {
+    resultMessage = data;
+    return;
+  }
+  if (data && typeof data.value === 'number') {
+    resultMessage = data;
+    return;
+  }
+  if (data && typeof data.result === 'number') {
+    resultMessage = data.result;
+    return;
+  }
+  if (data && data.result && typeof data.result === 'object') {
+    resultMessage = data.result; 
+    return;
+  }
+
+  if (typeof data === 'string') { errorMsg = data; return; }
+
+if (data && typeof data.result === 'string') {
+  const msg = String(data.result).trim()
+    .replace(/^"|"$/g, '')  
+    .replace(/^Error:\s*/i, '');
+  errorMsg = `Error: ${msg}`;
+  resultMessage = '';
+  return;
+}
+  errorMsg =
+  (data && (data.detail || data.error || data.message)) ||
+  'An error occurred';
+resultMessage = '';
+
+} catch (e: any) {
+  errorMsg = e?.message ?? 'Unknown error';
+}
+
+
   }
 </script>
 
@@ -204,59 +237,60 @@ function symbolFor(eqId: string, varId: string): string {
           placeholder={v.placeholder ?? ''} />
       {/each}
 
-      <button class="calculate-btn" on:click={calculate}>Calculate</button>
+    <button class="calculate-btn" on:click={calculate}>Calculate</button>
     {/if}
 
     {#if errorMsg}
-      <p class="error">{errorMsg}</p>
-    {/if}
+  <p class="error-bar">{errorMsg}</p>
+  {/if}
+
 
     {#if resultMessage && !errorMsg}
       <div class="result-info">
         <strong>Result:</strong>
 
-        {#if typeof resultMessage === 'object'}
-          <table>
- <thead>
-  <tr>
-    {#each Object.entries(resultMessage) as [key, _]}
-      <th>{@html symbolFor(selectedEqId, key)}</th>
-    {/each}
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    {#each Object.entries(resultMessage) as [key, val]}
-      <td>
-        {#if typeof val === 'number'}
-          {formatNumber(val)} {unitFor(selectedEqId, key)}
-        {:else}
-          {val}
-        {/if}
-      </td>
-    {/each}
-  </tr>
-</tbody>
+ {#if typeof resultMessage === 'object' && resultMessage !== null && !Array.isArray(resultMessage)}
+  <table>
+    <thead>
+      <tr>
+        {#each Object.entries(resultMessage) as [key, _]}
+          <th>{@html symbolFor(selectedEqId, key)}</th>
+        {/each}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        {#each Object.entries(resultMessage) as [key, val]}
+          <td>
+            {#if typeof val === 'number'}
+              {formatNumber(val)} {unitFor(selectedEqId, key)}
+            {:else}
+              {val}
+            {/if}
+          </td>
+        {/each}
+      </tr>
+    </tbody>
+  </table>
 
-          </table>
-        {:else}
-          <table>
-<thead>
-  <tr>
-    <th>{@html symbolFor(selectedEqId, solveFor)}</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td>{formatNumber(Number(resultMessage))} {unitFor(selectedEqId, solveFor)}</td>
-  </tr>
-</tbody>
+{:else if typeof resultMessage === 'number'}
+  <table>
+    <thead>
+      <tr>
+        <th>{@html symbolFor(selectedEqId, solveFor)}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{formatNumber(resultMessage)} {unitFor(selectedEqId, solveFor)}</td>
+      </tr>
+    </tbody>
+  </table>
+{/if}
 
-          </table>
-        {/if}
-      </div>
-    {/if}
-  {/if}
+</div>
+{/if}
+{/if}
 </div>
 
 <style>
@@ -281,8 +315,8 @@ function symbolFor(eqId: string, varId: string): string {
 
   label {
     display: block;
-    font-size: 1rem;
-    margin-top: 28px;
+    font-size: 1.05rem;
+    margin-top: 42px;
     color: #222;
     font-weight: 700;
   }
@@ -352,14 +386,16 @@ function symbolFor(eqId: string, varId: string): string {
   }
   .calculate-btn:hover { background: #9c0033; }
 
-  .error {
-    color: #fff;
-    background:#b00020;
-    padding: 10px;
-    border-radius: 6px;
-    max-width: 600px;
-    margin-top: 14px;
-  }
+  .error-bar {
+  color: #fff;
+  background-color: #b00020;
+  padding: 10px;
+  border-radius: 6px;
+  max-width: 600px;
+  margin: 14px auto 0;
+  text-align: center;
+}
+
 
   .result-info {
     margin-top: 18px;

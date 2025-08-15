@@ -94,8 +94,6 @@ const fluidOptions: FluidOption[] = [
   { id: 'superheatedR134', label: 'Superheated Refrigerant-134a' }
 ];
 
-
-
   type FluidType = 'pressureSatWater' | 'temperatureSatWater' | 'superheatedH20' | 'compLiqWat' | 'SatIceWat' | 'temperatureSatR134' | 'pressureSatR134' | 'superheatedR134' | 'airData' | 'idealN2' | 'idealO2'
   | 'idealCO2' | 'idealCO' | 'idealH2' | 'idealH2O' | 'idealO' | 'molGCP' | 'specHeat300' | 'specHeat' | 'idealOH';
 
@@ -496,13 +494,13 @@ const response = await fetch(endpoint, {
         </tbody>
       </table>
     {:else}
-      <p style="color: white; background-color: #b00020; padding: 10px; border-radius: 6px; max-width: 600px; margin: 0 auto;">
-        {resultMessage}
-      </p>
+      <p class="error-bar">{resultMessage}</p>
     {/if}
   </div>
 {/if}
 </div>
+
+
 
 
 <style>
@@ -623,4 +621,16 @@ const response = await fetch(endpoint, {
     border: 1px solid #ddd;
     padding: 12px;
   }
+
+  .error-bar {
+  color: #fff;
+  background-color: #b00020;
+  padding: 10px;
+  border-radius: 6px;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center; /* centers the text */
+  margin-top: 14px
+}
+
 </style>
