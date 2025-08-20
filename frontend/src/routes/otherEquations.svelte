@@ -3,6 +3,8 @@
   type VarDef = { id: string; label: string; placeholder?: string };
   type EqDef = { id: string; title: string; variables: VarDef[] };
 
+  let useWorkInstead = false;
+
   const EQUATIONS: EqDef[] = [
     {
       id: 'refEfficency',
@@ -10,7 +12,8 @@
       variables: [
         { id: 'COP', label: 'Coefficient of Performance <i>(COP)</i>', placeholder: 'e.g., 2.5' },
         { id: 'Qc',  label: 'Cooling Load <i>(Q<sub>c</sub>, kW)</i>',  placeholder: 'e.g., 500' },
-        { id: 'Qh',  label: 'Heat Rejected <i>(Q<sub>h</sub>, kW)</i>', placeholder: 'e.g., 800' }
+        { id: 'Qh',  label: 'Heat Rejected <i>(Q<sub>h</sub>, kW)</i>', placeholder: 'e.g., 800' },
+        { id: 'Wnet', label: 'Net Work <i>(W<sub>net</sub>, kW)</i>', placeholder: 'e.g., 800' },
       ]
     },
     {
@@ -30,9 +33,8 @@
     }
   ];
 
-
   const UNITS: Record<string, Record<string, string>> = {
-    refEfficency: { COP: '', Qc: 'kW', Qh: 'kW' },
+    refEfficency: { COP: '', Qc: 'kW', Qh: 'kW', Wnet: 'kW' },
     erb1SteadyState: {
       Qdot: 'kW', Wdot: 'kW', mdot: 'kg/s',
       h1: 'kJ/kg', h2: 'kJ/kg', V1: 'm/s', V2: 'm/s', z1: 'm', z2: 'm'
@@ -40,28 +42,28 @@
   };
 
   const SYMBOLS: Record<string, Record<string, string>> = {
-  refEfficency: {
-    COP: 'COP',
-    Qc: 'Q<sub>c</sub>',
-    Qh: 'Q<sub>h</sub>'
-  },
-  erb1SteadyState: {
-    Qdot: 'Q̇<sub>cv</sub>',
-    Wdot: 'Ẇ<sub>cv</sub>',
-    mdot: 'ṁ',
-    h1: 'h<sub>1</sub>',
-    h2: 'h<sub>2</sub>',
-    V1: 'V<sub>1</sub>',
-    V2: 'V<sub>2</sub>',
-    z1: 'z<sub>1</sub>',
-    z2: 'z<sub>2</sub>'
+    refEfficency: {
+      COP: 'COP',
+      Qc: 'Q<sub>c</sub>',
+      Qh: 'Q<sub>h</sub>',
+      Wnet: 'W<sub>net</sub>'
+    },
+    erb1SteadyState: {
+      Qdot: 'Q̇<sub>cv</sub>',
+      Wdot: 'Ẇ<sub>cv</sub>',
+      mdot: 'ṁ',
+      h1: 'h<sub>1</sub>',
+      h2: 'h<sub>2</sub>',
+      V1: 'V<sub>1</sub>',
+      V2: 'V<sub>2</sub>',
+      z1: 'z<sub>1</sub>',
+      z2: 'z<sub>2</sub>'
+    }
+  };
+
+  function symbolFor(eqId: string, varId: string): string {
+    return SYMBOLS[eqId]?.[varId] ?? varId;
   }
-};
-
-function symbolFor(eqId: string, varId: string): string {
-  return SYMBOLS[eqId]?.[varId] ?? varId;
-}
-
 
   function unitFor(eqId: string, varId: string): string {
     return UNITS[eqId]?.[varId] ?? '';
@@ -71,7 +73,6 @@ function symbolFor(eqId: string, varId: string): string {
     return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
   }
 
-
   let selectedEqId = '';
   let solveFor = '';
   let inputs: Record<string, string> = {};
@@ -80,6 +81,16 @@ function symbolFor(eqId: string, varId: string): string {
 
   let currentEq: EqDef | null = null;
   $: currentEq = EQUATIONS.find((e) => e.id === selectedEqId) ?? null;
+
+
+  $: activeVariables =
+    currentEq?.id === 'refEfficency'
+      ? currentEq.variables.filter(v => {
+          if (useWorkInstead && v.id === 'Qh') return false;
+          if (!useWorkInstead && v.id === 'Wnet') return false;
+          return true;
+        })
+      : currentEq?.variables ?? [];
 
   const main = (html: string) => (html.includes('<i>') ? html.split('<i>')[0] : html);
   const small = (html: string) => (html.includes('<i>') ? html.split('<i>')[1].replace('</i>', '') : '');
@@ -97,8 +108,8 @@ function symbolFor(eqId: string, varId: string): string {
     inputs = {};
     resultMessage = '';
     errorMsg = '';
+    useWorkInstead = false; // reset toggle on change
   }
-
 
   async function calculate() {
     errorMsg = '';
@@ -109,13 +120,11 @@ function symbolFor(eqId: string, varId: string): string {
     if (!solveFor) { errorMsg = 'Choose what to solve for.'; return; }
 
     const payloadInputs: Record<string, number> = {};
-    for (const v of eq.variables) {
+    for (const v of activeVariables) {
       if (v.id === solveFor) continue;
+
       const raw = inputs[v.id];
-      if (raw == null || raw === '') {
-        errorMsg = `Missing input: ${v.id}`;
-        return;
-      }
+      if (!raw) { errorMsg = `Missing input: ${v.id}`; return; }
       const num = Number(raw);
       if (!Number.isFinite(num)) {
         errorMsg = `Invalid number for ${v.id}`;
@@ -130,64 +139,61 @@ function symbolFor(eqId: string, varId: string): string {
       inputs: payloadInputs
     };
 
-try {
-  const res = await fetch('http://localhost:8000/api/calculate/general', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
+    try {
+      const res = await fetch('http://localhost:8000/api/calculate/general', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-  const raw = await res.text();
-  let data: any = null;
-  try { data = raw ? JSON.parse(raw) : null; } catch { /* raw is plain text */ }
+      const raw = await res.text();
+      let data: any = null;
+      try { data = raw ? JSON.parse(raw) : null; } catch { /* raw is plain text */ }
 
-  if (!res.ok) {
-    const msg =
-      (data && (data.detail || data.error || data.message)) ||
-      raw ||
-      'Server error';
-    errorMsg = msg;
-    return;
-  }
+      if (!res.ok) {
+        const msg =
+          (data && (data.detail || data.error || data.message)) ||
+          raw ||
+          'Server error';
+        errorMsg = msg;
+        return;
+      }
 
+      if (typeof data === 'number') {
+        resultMessage = data;
+        return;
+      }
+      if (data && typeof data.value === 'number') {
+        resultMessage = data;
+        return;
+      }
+      if (data && typeof data.result === 'number') {
+        resultMessage = data.result;
+        return;
+      }
+      if (data && data.result && typeof data.result === 'object') {
+        resultMessage = data.result;
+        return;
+      }
 
-  if (typeof data === 'number') {
-    resultMessage = data;
-    return;
-  }
-  if (data && typeof data.value === 'number') {
-    resultMessage = data;
-    return;
-  }
-  if (data && typeof data.result === 'number') {
-    resultMessage = data.result;
-    return;
-  }
-  if (data && data.result && typeof data.result === 'object') {
-    resultMessage = data.result; 
-    return;
-  }
+      if (typeof data === 'string') { errorMsg = data; return; }
 
-  if (typeof data === 'string') { errorMsg = data; return; }
+      if (data && typeof data.result === 'string') {
+        const msg = String(data.result).trim()
+          .replace(/^"|"$/g, '')
+          .replace(/^Error:\s*/i, '');
+        errorMsg = `Error: ${msg}`;
+        resultMessage = '';
+        return;
+      }
+      errorMsg =
+        (data && (data.detail || data.error || data.message)) ||
+        'An error occurred';
+      resultMessage = '';
 
-if (data && typeof data.result === 'string') {
-  const msg = String(data.result).trim()
-    .replace(/^"|"$/g, '')  
-    .replace(/^Error:\s*/i, '');
-  errorMsg = `Error: ${msg}`;
-  resultMessage = '';
-  return;
-}
-  errorMsg =
-  (data && (data.detail || data.error || data.message)) ||
-  'An error occurred';
-resultMessage = '';
-
-} catch (e: any) {
-  errorMsg = e?.message ?? 'Unknown error';
-}
-
-
+    } catch (e: any) {
+      errorMsg = e?.message ?? 'Unknown error';
+    }
   }
 </script>
 
@@ -210,87 +216,132 @@ resultMessage = '';
   </select>
 
   {#if currentEq}
-    <span id="solvefor-label" class="group-label">What do you want to solve for?</span>
-    <div class="var-buttons" role="group" aria-labelledby="solvefor-label">
-      {#each currentEq.variables as v}
+  <span id="solvefor-label" class="group-label">What do you want to solve for?</span>
+  <div class="var-buttons" role="group" aria-labelledby="solvefor-label">
+    <!-- Always show 4 buttons for COP, Qc, Qh, Wnet -->
+    <button
+      type="button"
+      class:active={solveFor === 'COP'}
+      on:click={() => { solveFor = 'COP'; resultMessage = ''; errorMsg = ''; useWorkInstead = false; }}
+    >COP</button>
+
+    <button
+      type="button"
+      class:active={solveFor === 'Qc'}
+      on:click={() => { solveFor = 'Qc'; resultMessage = ''; errorMsg = ''; useWorkInstead = false; }}
+    >Q<sub>c</sub></button>
+
+    <button
+      type="button"
+      class:active={solveFor === 'Qh'}
+      on:click={() => { solveFor = 'Qh'; resultMessage = ''; errorMsg = ''; useWorkInstead = false; }}
+    >Q<sub>h</sub></button>
+
+    <button
+      type="button"
+      class:active={solveFor === 'Wnet'}
+      on:click={() => { solveFor = 'Wnet'; resultMessage = ''; errorMsg = ''; useWorkInstead = false; }}
+    >W<sub>net</sub></button>
+  </div>
+
+  {#if solveFor}
+    <!-- Render inputs -->
+    {#if solveFor === 'COP' || solveFor === 'Qc'}
+      <!-- Inputs for Qc and Qh, with toggle -->
+      <label for="var-Qc">Cooling Load <span class="small"><i>(Q<sub>c</sub>, kW)</i></span></label>
+      <input id="var-Qc" type="text" bind:value={inputs.Qc} placeholder="e.g., 500" />
+
+      <div class="label-row">
+        <label for="var-Qh">
+          {#if useWorkInstead}
+            Net Work <span class="small"><i>(W<sub>net</sub>, kW)</i></span>
+          {:else}
+            Heat Rejected <span class="small"><i>(Q<sub>h</sub>, kW)</i></span>
+          {/if}
+        </label>
+
         <button
           type="button"
-          class:active={solveFor === v.id}
-          on:click={() => { solveFor = v.id; resultMessage = ''; errorMsg = ''; }}
-          aria-pressed={solveFor === v.id}
-        >
-          {@html symbolHTML(v)}
+          class="swap-btn"
+          on:click={() => { useWorkInstead = !useWorkInstead; inputs = {}; }}>
+          {useWorkInstead ? 'Use Qh instead' : 'Use Work Input instead'}
         </button>
-      {/each}
-    </div>
+      </div>
 
-    {#if solveFor}
-      {#each currentEq.variables.filter(v => v.id !== solveFor) as v (v.id)}
-        <label for={`var-${v.id}`}>
-          {@html main(v.label)}
-          <span class="small">{@html small(v.label)}</span>
-        </label>
-        <input
-          id={`var-${v.id}`}
-          type="text"
-          bind:value={inputs[v.id]}
-          placeholder={v.placeholder ?? ''} />
-      {/each}
+      <input
+        id="var-Qh"
+        type="text"
+        bind:value={inputs[useWorkInstead ? 'Wnet' : 'Qh']}
+        placeholder={useWorkInstead ? 'e.g., 150' : 'e.g., 800'} />
 
-    <button class="calculate-btn" on:click={calculate}>Calculate</button>
+    {:else if solveFor === 'Qh'}
+      <!-- Inputs for COP and Qc -->
+      <label for="var-COP">Coefficient of Performance <span class="small"><i>(COP)</i></span></label>
+      <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 2.5" />
+
+      <label for="var-Qc">Cooling Load <span class="small"><i>(Q<sub>c</sub>, kW)</i></span></label>
+      <input id="var-Qc" type="text" bind:value={inputs.Qc} placeholder="e.g., 500" />
+
+    {:else if solveFor === 'Wnet'}
+      <label for="var-COP">Coefficient of Performance <span class="small"><i>(COP)</i></span></label>
+      <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 2.5" />
+
+      <label for="var-Qc">Cooling Load <span class="small"><i>(Q<sub>c</sub>, kW)</i></span></label>
+      <input id="var-Qc" type="text" bind:value={inputs.Qc} placeholder="e.g., 500" />
     {/if}
 
-    {#if errorMsg}
-  <p class="error-bar">{errorMsg}</p>
-  {/if}
+    <button class="calculate-btn" on:click={calculate}>Calculate</button>
+  
+{/if}
 
+
+    {#if errorMsg}
+      <p class="error-bar">{errorMsg}</p>
+    {/if}
 
     {#if resultMessage && !errorMsg}
       <div class="result-info">
         <strong>Result:</strong>
-
- {#if typeof resultMessage === 'object' && resultMessage !== null && !Array.isArray(resultMessage)}
-  <table>
-    <thead>
-      <tr>
-        {#each Object.entries(resultMessage) as [key, _]}
-          <th>{@html symbolFor(selectedEqId, key)}</th>
-        {/each}
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        {#each Object.entries(resultMessage) as [key, val]}
-          <td>
-            {#if typeof val === 'number'}
-              {formatNumber(val)} {unitFor(selectedEqId, key)}
-            {:else}
-              {val}
-            {/if}
-          </td>
-        {/each}
-      </tr>
-    </tbody>
-  </table>
-
-{:else if typeof resultMessage === 'number'}
-  <table>
-    <thead>
-      <tr>
-        <th>{@html symbolFor(selectedEqId, solveFor)}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>{formatNumber(resultMessage)} {unitFor(selectedEqId, solveFor)}</td>
-      </tr>
-    </tbody>
-  </table>
-{/if}
-
-</div>
-{/if}
-{/if}
+        {#if typeof resultMessage === 'object' && resultMessage !== null && !Array.isArray(resultMessage)}
+          <table>
+            <thead>
+              <tr>
+                {#each Object.entries(resultMessage) as [key, _]}
+                  <th>{@html symbolFor(selectedEqId, key)}</th>
+                {/each}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                {#each Object.entries(resultMessage) as [key, val]}
+                  <td>
+                    {#if typeof val === 'number'}
+                      {formatNumber(val)} {unitFor(selectedEqId, key)}
+                    {:else}
+                      {val}
+                    {/if}
+                  </td>
+                {/each}
+              </tr>
+            </tbody>
+          </table>
+        {:else if typeof resultMessage === 'number'}
+          <table>
+            <thead>
+              <tr>
+                <th>{@html symbolFor(selectedEqId, solveFor)}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{formatNumber(resultMessage)} {unitFor(selectedEqId, solveFor)}</td>
+              </tr>
+            </tbody>
+          </table>
+        {/if}
+      </div>
+    {/if}
+  {/if}
 </div>
 
 <style>
@@ -304,7 +355,6 @@ resultMessage = '';
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
     font-family: system-ui, sans-serif;
   }
-
   h2 {
     font-size: 1.4rem;
     color: #7A0019;
@@ -312,7 +362,6 @@ resultMessage = '';
     margin-top: 27px;
     margin-bottom: 6px;
   }
-
   label {
     display: block;
     font-size: 1.05rem;
@@ -320,9 +369,7 @@ resultMessage = '';
     color: #222;
     font-weight: 700;
   }
-
   .small { font-size: .85em; color: #555; }
-
   select, input {
     width: 100%;
     padding: 10px;
@@ -333,7 +380,6 @@ resultMessage = '';
     color: #333;
     margin-top: 6px;
   }
-
   .group-label {
     display: block;
     font-size: 1rem;
@@ -342,14 +388,12 @@ resultMessage = '';
     color: #222;
     font-weight: 700;
   }
-
   .var-buttons {
     display: flex;
     gap: 8px;
     margin-top: 10px;
     flex-wrap: wrap;
   }
-
   .var-buttons button {
     background: #f2f2f2;
     color: #333;
@@ -371,7 +415,6 @@ resultMessage = '';
     box-shadow: 0 0 0 2px #fff;
   }
   .var-buttons button:active { transform: translateY(1px); }
-
   .calculate-btn {
     background: #7A0019;
     color: #fff;
@@ -385,22 +428,16 @@ resultMessage = '';
     margin-top: 35px;
   }
   .calculate-btn:hover { background: #9c0033; }
-
   .error-bar {
-  color: #fff;
-  background-color: #b00020;
-  padding: 10px;
-  border-radius: 6px;
-  max-width: 600px;
-  margin: 14px auto 0;
-  text-align: center;
-}
-
-
-  .result-info {
-    margin-top: 18px;
+    color: #fff;
+    background-color: #b00020;
+    padding: 10px;
+    border-radius: 6px;
+    max-width: 600px;
+    margin: 14px auto 0;
+    text-align: center;
   }
-
+  .result-info { margin-top: 18px; }
   table {
     width: 100%;
     margin-top: 14px;
@@ -417,4 +454,22 @@ resultMessage = '';
     font-weight: bold;
     color: #333;
   }
+  .swap-btn {
+    background: #eee;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .swap-btn:hover { background: #ddd; }
+  .label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 42px;
+  }
+  .label-row label { margin: 0; }
 </style>
