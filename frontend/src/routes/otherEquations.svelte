@@ -404,11 +404,6 @@
     transition: transform .05s ease, background .2s;
   }
   .var-buttons button.active,
-  .var-buttons button[aria-pressed="true"] {
-    background: #7A0019;
-    color: #fff;
-    border-color: #7A0019;
-  }
   .var-buttons button:focus-visible {
     outline: 2px solid #7A0019;
     outline-offset: 2px;
