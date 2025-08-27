@@ -10,6 +10,7 @@ from backend.core.calculations.saturatedFluidsCalc import SaturatedFluidCalculat
 from backend.core.calculations.unitConversion import UnitConverter
 from backend.core.calculations.workCalculation import calculate_work
 from backend.core.calculations.generalEquations import get_general_solver
+from backend.core.calculations.compLiqWater import CompLiqWaterCalculation
 
 
     
@@ -54,3 +55,7 @@ def handle_calculation_workProcess(process: str, inputs: dict):
 def handle_calculation_general(equation_id: str, solve_for: str, inputs: Dict[str, float]) -> Any:
     solver = get_general_solver(equation_id)
     return solver(solve_for, inputs)
+
+def handle_calculation_compLiqWater(fluid_type: str, inputs: dict):
+    calc = CompLiqWaterCalculation(inputs)
+    return calc.calculate()

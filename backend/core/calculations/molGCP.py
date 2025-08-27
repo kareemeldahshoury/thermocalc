@@ -8,7 +8,7 @@ molGCP_data = {
     "argon": ["Ar", 39.948, 0.2081, 151, 4.86, 0.0749],
     "benzene": ["C₆H₆", 78.115, 0.1064, 562, 4.92, 0.2603],
     "bromine": ["Br₂", 159.808, 0.0520, 584, 10.34, 0.1355],
-    "n_butane": ["C₄H₁₀", 58.124, 0.1430, 425.2, 3.80, 0.2547],
+    "n-butane": ["C₄H₁₀", 58.124, 0.1430, 425.2, 3.80, 0.2547],
     "carbon_dioxide": ["CO₂", 44.01, 0.1889, 304.2, 7.39, 0.0943],
     "carbon_monoxide": ["CO", 28.011, 0.2968, 133, 3.50, 0.0930],
     "carbon_tetrachloride": ["CCl₄", 153.82, 0.05405, 556.4, 4.56, 0.2759],
@@ -20,7 +20,7 @@ molGCP_data = {
     "ethyl_alcohol": ["C₂H₅OH", 46.07, 0.1805, 516, 6.38, 0.1673],
     "ethylene": ["C₂H₄", 28.054, 0.2964, 282.4, 5.12, 0.1242],
     "helium": ["He", 4.003, 2.0769, 5.3, 0.23, 0.0578],
-    "n_hexane": ["C₆H₁₄", 86.179, 0.09647, 507.9, 3.03, 0.3677],
+    "n-hexane": ["C₆H₁₄", 86.179, 0.09647, 507.9, 3.03, 0.3677],
     "hydrogen": ["H₂", 2.016, 4.1240, 33.3, 1.30, 0.0649],
     "krypton": ["Kr", 83.80, 0.09921, 209.4, 5.50, 0.0924],
     "methane": ["CH₄", 16.043, 0.5182, 191.1, 4.64, 0.0993],
@@ -45,12 +45,33 @@ def molGCPCalculation(substance: str) -> Dict[str, str | float]:
         raise ValueError(f"Substance '{substance}' not found in molar gas data.")
     
     formula, M, R, T_crit, P_crit, V_crit = molGCP_data[substance]
-    return {
-    "Substance<br>": substance.replace("_", " ").title(),
-    "Formula<br>": formula,
-    "Molar Mass<br>(kg/kmol)": M,
-    "Gas Constant<br> (R, kJ/kg·K)": R,
-    "Critical Temp<br>(Tₛ, K)": T_crit,
-    "Critical Pressure<br>(Pₛ, MPa)": P_crit,
-    "Critical Volume<br>(Vₛ, m³/kmol)": V_crit
-}
+
+    if substance == "n-butane":
+        return {
+        "Substance<br>": "n-Butane",
+        "Formula<br>": formula,
+        "Molar Mass<br>(kg/kmol)": M,
+        "Gas Constant<br> (R, kJ/kg·K)": R,
+        "Critical Temp<br>(Tₛ, K)": T_crit,
+        "Critical Pressure<br>(Pₛ, MPa)": P_crit,
+        "Critical Volume<br>(Vₛ, m³/kmol)": V_crit
+        }
+    elif substance == "n-hexane":
+        return {
+        "Substance<br>": "n-Hexane",
+        "Formula<br>": formula,
+        "Molar Mass<br>(kg/kmol)": M,
+        "Gas Constant<br> (R, kJ/kg·K)": R,
+        "Critical Temp<br>(Tₛ, K)": T_crit,
+        "Critical Pressure<br>(Pₛ, MPa)": P_crit,
+        "Critical Volume<br>(Vₛ, m³/kmol)": V_crit}
+    else:
+        return {
+        "Substance<br>": substance.replace("_", " ").title(),
+        "Formula<br>": formula,
+        "Molar Mass<br>(kg/kmol)": M,
+        "Gas Constant<br> (R, kJ/kg·K)": R,
+        "Critical Temp<br>(Tₛ, K)": T_crit,
+        "Critical Pressure<br>(Pₛ, MPa)": P_crit,
+        "Critical Volume<br>(Vₛ, m³/kmol)": V_crit
+        }

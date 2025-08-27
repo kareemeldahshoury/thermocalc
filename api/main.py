@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.models.calculationRequest import CalculationRequest
 from backend.controller.calculationController import ( handle_calculation_superHeatedWater, handle_calculation_idealAir,
 handle_calculation_superheated134, handle_calculation_molGCP, handle_calculation_specHeat300, handle_calculation_specHeat, handle_calculation_idealGas, handle_calculation_saturatedFluid,
-handle_unit_conversion, handle_calculation_general)
+handle_unit_conversion, handle_calculation_general, handle_calculation_compLiqWater)
 from pydantic import BaseModel
 from typing import Union
 from backend.models.unitConversionModel import UnitConversionRequest
@@ -254,6 +254,20 @@ def calculate_general(req: GeneralSolveRequest):
         result = handle_calculation_general(
             equation_id=req.equationId,
             solve_for=req.solveFor,
+            inputs=req.inputs
+        )
+        return {"result": result}
+    except ValueError as e:
+        return {"result": f"Error: {str(e)}"}
+    except Exception as e:
+        return {"result": f"Unexpected error: {str(e)}"}
+
+
+@app.post("/api/calculate/compLiqWater")
+def calculate_compLiqWater(req: CalculationRequest):
+    try:
+        result = handle_calculation_compLiqWater(
+            fluid_type=req.fluidType,
             inputs=req.inputs
         )
         return {"result": result}

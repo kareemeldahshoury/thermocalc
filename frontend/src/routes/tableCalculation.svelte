@@ -21,11 +21,11 @@ function getPlaceholder(inputId: string, fluid: FluidType): string {
       case 'pressureSatR134':
         return 'Enter a value from 0.06 to 40 bar';
       case 'superheatedH20':
-        return 'Enter a value from 1 to 100 bar';
+        return 'Enter a value from 1 to 600 bar';
       case 'superheatedR134':
         return 'Enter a value from 0.06 to 40 bar';
       case 'compLiqWat':
-        return 'Enter a value from 1 to 300 bar';
+        return 'Enter either 50, 100, 150, 200, 300 or 500 bar ';
       default:
         return 'Enter pressure in bar';
     }
@@ -36,13 +36,13 @@ function getPlaceholder(inputId: string, fluid: FluidType): string {
       case 'temperatureSatWater':
         return 'Enter a value from 0 to 373.95 °C';
       case 'superheatedH20':
-        return 'Enter a value from 100 to 800 °C';
+        return 'Enter a value from 100 to 1300 °C';
       case 'superheatedR134':
         return 'Enter a value from 20 to 160 °C';
       case 'temperatureSatR134':
         return 'Enter a value from -40 to 100 °C';
       case 'compLiqWat':
-        return 'Enter a value from 0 to 300 °C';
+        return 'Enter a value from 0 to 380 °C';
       case 'idealN2':
         return 'Enter a value from 220 to 3250 K';
       case 'idealO2':
@@ -103,31 +103,31 @@ const fluidOptions: FluidOption[] = [
   { id: 'argon', name: 'Argon (Ar)' },
   { id: 'benzene', name: 'Benzene (C₆H₆)' },
   { id: 'bromine', name: 'Bromine (Br₂)' },
-  { id: 'n_butane', name: 'n-Butane (C₄H₁₀)' },
-  { id: 'carbon_dioxide', name: 'Carbon dioxide (CO₂)' },
-  { id: 'carbon_monoxide', name: 'Carbon monoxide (CO)' },
-  { id: 'carbon_tetrachloride', name: 'Carbon tetrachloride (CCl₄)' },
+  { id: 'n-butane', name: 'n-Butane (C₄H₁₀)' },
+  { id: 'carbon_dioxide', name: 'Carbon Dioxide (CO₂)' },
+  { id: 'carbon_monoxide', name: 'Carbon Monoxide (CO)' },
+  { id: 'carbon_tetrachloride', name: 'Carbon Tetrachloride (CCl₄)' },
   { id: 'chlorine', name: 'Chlorine (Cl₂)' },
   { id: 'chloroform', name: 'Chloroform (CHCl₃)' },
   { id: 'r12', name: 'Dichlorodifluoromethane (R-12)' },
   { id: 'r21', name: 'Dichlorofluoromethane (R-21)' },
   { id: 'ethane', name: 'Ethane (C₂H₆)' },
-  { id: 'ethyl_alcohol', name: 'Ethyl alcohol (C₂H₅OH)' },
+  { id: 'ethyl_alcohol', name: 'Ethyl Alcohol (C₂H₅OH)' },
   { id: 'ethylene', name: 'Ethylene (C₂H₄)' },
   { id: 'helium', name: 'Helium (He)' },
-  { id: 'n_hexane', name: 'n-Hexane (C₆H₁₄)' },
+  { id: 'n-hexane', name: 'n-Hexane (C₆H₁₄)' },
   { id: 'hydrogen', name: 'Hydrogen (H₂)' },
   { id: 'krypton', name: 'Krypton (Kr)' },
   { id: 'methane', name: 'Methane (CH₄)' },
-  { id: 'methyl_alcohol', name: 'Methyl alcohol (CH₃OH)' },
-  { id: 'methyl_chloride', name: 'Methyl chloride (CH₃Cl)' },
+  { id: 'methyl_alcohol', name: 'Methyl Alcohol (CH₃OH)' },
+  { id: 'methyl_chloride', name: 'Methyl Chloride (CH₃Cl)' },
   { id: 'neon', name: 'Neon (Ne)' },
   { id: 'nitrogen', name: 'Nitrogen (N₂)' },
-  { id: 'nitrous_oxide', name: 'Nitrous oxide (N₂O)' },
+  { id: 'nitrous_oxide', name: 'Nitrous Oxide (N₂O)' },
   { id: 'oxygen', name: 'Oxygen (O₂)' },
   { id: 'propane', name: 'Propane (C₃H₈)' },
   { id: 'propylene', name: 'Propylene (C₃H₆)' },
-  { id: 'sulfur_dioxide', name: 'Sulfur dioxide (SO₂)' },
+  { id: 'sulfur_dioxide', name: 'Sulfur Dioxide (SO₂)' },
   { id: 'r134a', name: 'Tetrafluoroethane (R-134a)' },
   { id: 'r11', name: 'Trichlorofluoromethane (R-11)' },
   { id: 'water', name: 'Water (H₂O)' },
@@ -202,8 +202,8 @@ const fluidInputs: Record<FluidType, Array<{ id: string, label: string }>> = {
     { id: 'temperature', label: 'Temperature <i>(°C)</i>' }
   ],
   superheatedH20: [
-    { id: 'temperature', label: 'Temperature <i>(°C)</i>' },
-    { id: 'pressure', label: 'Pressure <i>(bar)</i>' }
+    { id: 'pressure', label: 'Pressure <i>(bar)</i>' },
+    { id: 'temperature', label: 'Temperature <i>(°C)</i>' }
   ],
   compLiqWat: [
     { id: 'temperature', label: 'Temperature <i>(°C)</i>' },
@@ -222,8 +222,8 @@ const fluidInputs: Record<FluidType, Array<{ id: string, label: string }>> = {
     { id: 'pressure', label: 'Pressure <i>(bar)</i>' }
   ],
   superheatedR134: [
-    { id: 'temperature', label: 'Temperature <i>(°C)</i>' },
-    { id: 'pressure', label: 'Pressure <i>(bar)</i>' }
+    { id: 'pressure', label: 'Pressure <i>(bar)</i>' },
+    { id: 'temperature', label: 'Temperature <i>(°C)</i>' },    
   ],
   airData: [
     { id: 'temperature', label: 'Temperature <i>(K)</i>' }
@@ -286,8 +286,9 @@ if (selectedFluid.includes('Sat')) {
   endpoint = 'http://localhost:8000/api/calculate/specHeat';
 } else if (selectedFluid.startsWith('ideal')) {
   endpoint = 'http://localhost:8000/api/calculate/idealGas';
+} else if (selectedFluid === 'compLiqWat') {
+endpoint = 'http://localhost:8000/api/calculate/compLiqWater';
 }
-
   const payload: any = {
     fluidType: selectedFluid,
     inputs: inputValues
@@ -629,7 +630,7 @@ const response = await fetch(endpoint, {
   border-radius: 6px;
   max-width: 600px;
   margin: 0 auto;
-  text-align: center; /* centers the text */
+  text-align: center;
   margin-top: 14px
 }
 

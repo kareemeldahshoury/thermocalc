@@ -24,11 +24,9 @@ class SaturatedFluidCalculation:
         if not (0 <= self.x_value <= 1):
             raise ValueError(f"Quality {self.x_value} must be between 0 and 1.")
 
-        # Direct match
         if self.lookup_value in self.table:
             props = self.table[self.lookup_value]
         else:
-            # Interpolate between bounds
             for i in range(len(self.keys_sorted) - 1):
                 low, high = self.keys_sorted[i], self.keys_sorted[i + 1]
                 if low <= self.lookup_value <= high:
@@ -41,7 +39,7 @@ class SaturatedFluidCalculation:
                 for j in range(len(props_low))
             ]
 
-        # Unpack interpolated or matched values
+        
         temp_sat, vf, vg, uf, ufg, _, hf, hfg, _, sf, sfg, _ = props
 
         v = vf + self.x_value * (vg - vf)
@@ -49,13 +47,17 @@ class SaturatedFluidCalculation:
         h = hf + self.x_value * hfg
         s = sf + self.x_value * sfg
         return {
-    **{
-        f"{'Pressure' if self.lookup_type == 'pressure' else 'Temperature'}<br>(<em>{'P' if self.lookup_type == 'pressure' else 'T'}</em>, {'bar' if self.lookup_type == 'pressure' else '°C'})": self.lookup_value
-        },
-            "Quality<br>(<em>x</em>)": self.x_value,
-            "Saturation Temperature<br>(<em>T<sub>sat</sub></em> , °C)": round(temp_sat, 2),
-            "Specific Volume<br>(<em>v</em>, m³/kg)": round(v, 6),
-            "Internal Energy<br>(<em>u</em>, kJ/kg)": round(u, 2),
-            "Enthalpy<br>(<em>h</em>, kJ/kg)": round(h, 2),
-            "Entropy<br>(<em>s</em>, kJ/kg·K)": round(s, 4)
+    f"{'Pressure' if self.lookup_type == 'pressure' else 'Temperature'}<br>(<em>{'P' if self.lookup_type == 'pressure' else 'T'}</em>, {'bar' if self.lookup_type == 'pressure' else '°C'})": self.lookup_value,
+    "Quality<br>(<em>x</em>)": self.x_value,
+    **(
+        {
+            "Saturation Temperature<br>(<em>T<sub>sat</sub></em>, °C)": round(temp_sat, 5)
+        } if self.lookup_type == "pressure" else {
+            "Saturation Pressure<br>(<em>P<sub>sat</sub></em>, kPa)": f"{temp_sat:.6}"
+        }
+    ),
+    "Specific Volume<br>(<em>v</em>, m³/kg)": f"{v:.6}",
+    "Internal Energy<br>(<em>u</em>, kJ/kg)": round(u, 2),
+    "Enthalpy<br>(<em>h</em>, kJ/kg)": round(h, 2),
+    "Entropy<br>(<em>s</em>, kJ/kg·K)": f"{s:.5}",
 }
