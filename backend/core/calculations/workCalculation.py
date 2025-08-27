@@ -2,12 +2,10 @@ from math import log
 from typing import Dict
 
 R = 8.314  # J/mol·K
+scale = 0.1
 
 def calculate_work(process: str, inputs: Dict[str, float]) -> Dict[str, float]:
-    """
-    Returns a dictionary with labeled and formatted result,
-    raises ValueError on bad input
-    """
+
     if process == "isobaric":
         P = inputs["P"]
         V1 = inputs["V1"]
@@ -20,6 +18,7 @@ def calculate_work(process: str, inputs: Dict[str, float]) -> Dict[str, float]:
         T = inputs["T"]
         n = inputs["n"]
         work = n * R * T * log(V2 / V1)
+
 
     elif process == "adiabatic":
         P1 = inputs["P1"]
@@ -48,5 +47,5 @@ def calculate_work(process: str, inputs: Dict[str, float]) -> Dict[str, float]:
         raise ValueError(f"Unsupported process: {process}")
 
     return {
-        "Work<br>(W, J)": round(work, 4)
+        "Work<br>(W, J)": f"{work:.1}"
     }

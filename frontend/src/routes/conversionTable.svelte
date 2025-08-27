@@ -146,13 +146,14 @@
   .container {
     background-color: #fff;
     color: black;
-    padding: 20px;
+    padding: 10px;
     max-width: 1200px;
     margin: auto;
     font-family: 'Segoe UI', sans-serif;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 30px;
+    margin-top: -40px
   }
 
   .group h3 {

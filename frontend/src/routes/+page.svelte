@@ -5,6 +5,7 @@
   import WorkCalculator from './workCalculator.svelte';
   import { onMount } from 'svelte';
   import OtherEquations from './otherEquations.svelte';
+  import ComingSoon from './comingSoon.svelte';
 
 
 
@@ -192,6 +193,8 @@ onMount(() => {
           </p>
         </div>
 
+      {:else if selectedSubject && selectedSubject !== 'thermo'}
+        <ComingSoon />
       {:else if selectedCalculator === 'calc1'}
         <ConversionCalc />
       {:else if selectedCalculator === 'calc2'}

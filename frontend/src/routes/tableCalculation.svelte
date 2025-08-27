@@ -19,7 +19,7 @@ function getPlaceholder(inputId: string, fluid: FluidType): string {
       case 'pressureSatWater':
         return 'Enter a value from 0.01 to 220.64 bar';
       case 'pressureSatR134':
-        return 'Enter a value from 0.06 to 40 bar';
+        return 'Enter a value from 0.6 to 30 bar';
       case 'superheatedH20':
         return 'Enter a value from 1 to 600 bar';
       case 'superheatedR134':
