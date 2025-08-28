@@ -22,23 +22,48 @@
   ];
 
   const processEquations: Record<string, Array<{ id: string; label: string }>> = {
-    Isobaric: [
-      { id: 'basic', label: 'W = P(V₂ - V₁)' },
-    ],
-    Isothermal: [
-      { id: 'nRT', label: 'W = nRT ln(V₂ / V₁)' },
-      { id: 'P1V1', label: 'W = P₁V₁ ln(V₂ / V₁)' },
-    ],
-    Adiabatic: [
-      { id: 'PV', label: 'W = [P₂V₂ - P₁V₁] / (1 - γ)' },
-      { id: 'TV', label: 'W = nR(T₂ - T₁) / (1 - γ)' },
-      { id: 'VV', label: 'W = P₁V₁ / (γ - 1) * [1 - (V₁/V₂)<sup>γ-1</sup>]' },
-    ],
-    Polytropic: [
-      { id: 'PV', label: 'W = [P₂V₂ - P₁V₁] / (1 - n)' },
-      { id: 'TV', label: 'W = mR(T₂ - T₁) / (1 - n)' },
-    ]
-  };
+  Isobaric: [
+    { id: 'basic', label: 'P ( V₂ - V₁ )' },
+  ],
+
+  Isothermal: [
+    { 
+      id: 'nRT', 
+      label: 'nRT · ln( <span class="frac"><span class="num">V₂</span><span class="den">V₁</span></span> )' 
+    },
+    { 
+      id: 'P1V1', 
+      label: 'P₁V₁ · ln( <span class="frac"><span class="num">V₂</span><span class="den">V₁</span></span> )' 
+    },
+  ],
+
+  Adiabatic: [
+    { 
+      id: 'PV', 
+      label: '<span class="frac"><span class="num">P₂V₂ - P₁V₁</span><span class="den">1 - γ</span></span>' 
+    },
+    { 
+      id: 'TV', 
+      label: '<span class="frac"><span class="num">nR ( T₂ - T₁ )</span><span class="den">1 - γ</span></span>' 
+    },
+    { 
+      id: 'VV', 
+      label: '<span class="frac"><span class="num">P₁V₁</span><span class="den">γ - 1</span></span> · [ 1 - ( <span class="frac"><span class="num">V₁</span><span class="den">V₂</span></span> )<sup>γ - 1</sup> ]' 
+    },
+  ],
+
+  Polytropic: [
+    { 
+      id: 'PV', 
+      label: '<span class="frac"><span class="num">P₂V₂ - P₁V₁</span><span class="den">1 - n</span></span>' 
+    },
+    { 
+      id: 'TV', 
+      label: '<span class="frac"><span class="num">mR ( T₂ - T₁ )</span><span class="den">1 - n</span></span>' 
+    },
+  ]
+};
+
 
   const equationInputs: Record<
   string,
@@ -226,6 +251,11 @@ function toggleProcessInfo() {
 
 
 </script>
+
+<div class="hidden">
+  <span class="frac"><span class="num"></span><span class="den"></span></span>
+</div>
+
 
 {#if showProcessInfo}
   <ProcessInfo />
@@ -514,5 +544,26 @@ th {
   margin-top: -32px;
   margin-left: 750px
 }
+
+:global(.frac) {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+:global(.frac .num) {
+  display: block;
+  padding: 0 .15em;
+}
+
+:global(.frac .den) {
+  display: block;
+  border-top: 1px solid currentColor;
+  margin-top: .1em;
+  padding: .1em .15em 0;
+}
+
 
 </style>
