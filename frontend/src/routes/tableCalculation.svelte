@@ -191,7 +191,7 @@ const fluidInputs: Record<FluidType, Array<{ id: string, label: string }>> = {
   molGCP: [],
   specHeat300: [],
   specHeat: [
-    { id: 'temperature', label: 'Temperature <i>(T, K)</i>' }
+    { id: 'temperature', label: 'Temperature <i>(K)</i>' }
   ],
   pressureSatWater: [
     { id: 'quality', label: 'Quality <i>(x)</i>' },
@@ -394,7 +394,9 @@ const response = await fetch(endpoint, {
       {/each}
     </select>
 
-    <label for="temperature">Temperature (K):</label>
+    <label for="temperature">
+      Temperature <span style="font-size: 0.85em; color: #555;">(K)</span>
+    </label>
     <input
       id="temperature"
       type="number"

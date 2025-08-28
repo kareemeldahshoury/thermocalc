@@ -2,6 +2,8 @@
 
  import ProcessInfo from "./processInfo.svelte";
 
+ safelist: ['small']
+
     
   let selectedProcess: string = '';
   let selectedEquation: string = '';
@@ -38,64 +40,71 @@
     ]
   };
 
-  const equationInputs: Record<string, Record<string, Array<{ id: string; label: string }>>> = {
-    Isobaric: {
-      basic: [
-        { id: 'P', label: 'Pressure <i>(P, bar)</i>' },
-        { id: 'V1', label: 'Initial Volume <i>(V<sub>1</sub>, m³)</i>' },
-        { id: 'V2', label: 'Final Volume <i>(V<sub>2</sub>, m³)</i>' },
-      ]
-    },
-    Isothermal: {
-      nRT: [
-        { id: 'n', label: 'Moles <i>(n)</i>' },
-        { id: 'T', label: 'Temperature <i>(T, K)</i>' },
-        { id: 'V1', label: 'Initial Volume <i>(V<sub>1</sub>, m³)</i>' },
-        { id: 'V2', label: 'Final Volume <i>(V<sub>2</sub>, m³)</i>' },
-      ],
-      P1V1: [
-        { id: 'P1', label: 'Initial Pressure <i>(P<sub>1</sub>, bar)</i>' },
-        { id: 'V1', label: 'Initial Volume <i>(V<sub>1</sub>, m³)</i>' },
-        { id: 'V2', label: 'Final Volume <i>(V<sub>2</sub>, m³)</i>' },
-      ]
-    },
-    Adiabatic: {
-      PV: [
-        { id: 'P1', label: 'Initial Pressure <i>(P<sub>1</sub>, bar)</i>' },
-        { id: 'V1', label: 'Initial Volume <i>(V<sub>1</sub>, m³)</i>' },
-        { id: 'P2', label: 'Final Pressure <i>(P<sub>2</sub>, bar)</i>' },
-        { id: 'V2', label: 'Final Volume <i>(V<sub>2</sub>, m³)</i>' },
-        { id: 'gamma', label: 'γ' }
-      ],
-      TV: [
-        { id: 'n', label: 'Moles <i>(n)</i>' },
-        { id: 'T1', label: 'Initial Temperature <i>(T<sub>1</sub>, K)</i>' },
-        { id: 'T2', label: 'Final Temperature <i>(T<sub>2</sub>, K)</i>' },
-        { id: 'gamma', label: 'γ' }
-      ],
-      VV: [
-        { id: 'P1', label: 'Initial Pressure <i>(P<sub>1</sub>, bar)</i>' },
-        { id: 'V1', label: 'Initial Volume <i>(V<sub>1</sub>, m³)</i>' },
-        { id: 'V2', label: 'Final Volume <i>(V<sub>2</sub>, m³)</i>' },
-        { id: 'gamma', label: 'γ' }
-      ]
-    },
-    Polytropic: {
-      PV: [
-        { id: 'P1', label: 'Initial Pressure <i>(P<sub>1</sub>, bar)</i>' },
-        { id: 'V1', label: 'Initial Volume <i>(V<sub>1</sub>, m³)</i>' },
-        { id: 'P2', label: 'Final Pressure <i>(P<sub>2</sub>, bar)</i>' },
-        { id: 'V2', label: 'Final Volume <i>(V<sub>2</sub>, m³)</i>' },
-        { id: 'n', label: 'n' }
-      ],
-      TV: [
-        { id: 'm', label: 'Mass <i>(kg)</i>' },
-        { id: 'T1', label: 'Initial Temperature <i>(T<sub>1</sub>, K)</i>' },
-        { id: 'T2', label: 'Final Temperature <i>(T<sub>2</sub>, K)</i>' },
-        { id: 'n', label: 'n' }
-      ]
-    }
-  };
+  const equationInputs: Record<
+  string,
+  Record<
+    string,
+    Array<{ id: string; label: string; symbol: string; unit: string }>
+  >
+> = {
+  Isobaric: {
+    basic: [
+      { id: 'P',  label: 'Pressure',        symbol: 'P',   unit: 'bar' },
+      { id: 'V1', label: 'Initial Volume',  symbol: 'V₁',  unit: 'm³' },
+      { id: 'V2', label: 'Final Volume',    symbol: 'V₂',  unit: 'm³' },
+    ]
+  },
+  Isothermal: {
+    nRT: [
+      { id: 'n',  label: 'Moles',        symbol: 'n',   unit: '' },
+      { id: 'T',  label: 'Temperature',  symbol: 'T',   unit: 'K' },
+      { id: 'V1', label: 'Initial Volume', symbol: 'V₁', unit: 'm³' },
+      { id: 'V2', label: 'Final Volume',   symbol: 'V₂', unit: 'm³' },
+    ],
+    P1V1: [
+      { id: 'P1', label: 'Initial Pressure', symbol: 'P₁', unit: 'bar' },
+      { id: 'V1', label: 'Initial Volume',   symbol: 'V₁', unit: 'm³' },
+      { id: 'V2', label: 'Final Volume',     symbol: 'V₂', unit: 'm³' },
+    ]
+  },
+  Adiabatic: {
+    PV: [
+      { id: 'P1', label: 'Initial Pressure', symbol: 'P₁', unit: 'bar' },
+      { id: 'V1', label: 'Initial Volume',   symbol: 'V₁', unit: 'm³' },
+      { id: 'P2', label: 'Final Pressure',   symbol: 'P₂', unit: 'bar' },
+      { id: 'V2', label: 'Final Volume',     symbol: 'V₂', unit: 'm³' },
+      { id: 'gamma', label: 'Heat Capacity Ratio', symbol: 'γ', unit: '' },
+    ],
+    TV: [
+      { id: 'n',  label: 'Moles',            symbol: 'n',  unit: '' },
+      { id: 'T1', label: 'Initial Temp',     symbol: 'T₁', unit: 'K' },
+      { id: 'T2', label: 'Final Temp',       symbol: 'T₂', unit: 'K' },
+      { id: 'gamma', label: 'Heat Capacity Ratio', symbol: 'γ', unit: '' },
+    ],
+    VV: [
+      { id: 'P1', label: 'Initial Pressure', symbol: 'P₁', unit: 'bar' },
+      { id: 'V1', label: 'Initial Volume',   symbol: 'V₁', unit: 'm³' },
+      { id: 'V2', label: 'Final Volume',     symbol: 'V₂', unit: 'm³' },
+      { id: 'gamma', label: 'Heat Capacity Ratio', symbol: 'γ', unit: '' },
+    ]
+  },
+  Polytropic: {
+    PV: [
+      { id: 'P1', label: 'Initial Pressure', symbol: 'P₁', unit: 'bar' },
+      { id: 'V1', label: 'Initial Volume',   symbol: 'V₁', unit: 'm³' },
+      { id: 'P2', label: 'Final Pressure',   symbol: 'P₂', unit: 'bar' },
+      { id: 'V2', label: 'Final Volume',     symbol: 'V₂', unit: 'm³' },
+      { id: 'n',  label: 'Polytropic Index', symbol: 'n',  unit: '' },
+    ],
+    TV: [
+      { id: 'm',  label: 'Mass',             symbol: '',  unit: 'kg' },
+      { id: 'T1', label: 'Initial Temp',     symbol: 'T₁', unit: 'K' },
+      { id: 'T2', label: 'Final Temp',       symbol: 'T₂', unit: 'K' },
+      { id: 'n',  label: 'Polytropic Index', symbol: 'n',  unit: '' },
+    ]
+  }
+};
+
 
   function tryParse(val: string): number | null {
     const num = parseFloat(val);
@@ -278,7 +287,18 @@ function toggleProcessInfo() {
 
     {#if selectedEquation && equationInputs[selectedProcess]?.[selectedEquation]}
       {#each equationInputs[selectedProcess][selectedEquation] as input}
-        <label for={input.id}>{@html input.label}:</label>
+       <label for={input.id}>
+             {input.label}
+             <span class="small">
+              {#if input.unit && input.symbol}
+               ({@html input.symbol}, {input.unit})
+               {:else if input.symbol}
+                  ({@html input.symbol})
+                {:else if input.unit}
+                   ({input.unit})
+              {/if}
+              </span>
+              </label>
         <input
           id={input.id}
           type="text"
@@ -373,6 +393,13 @@ input::placeholder {
   color: #888;
 }
 
+.small {
+  font-size: 0.85em;
+  color: #555;
+  font-weight: 700;
+}
+
+
 input:disabled {
   background-color: #f2f2f2;
   color: #888;
@@ -387,9 +414,9 @@ input:disabled {
 }
 
 .equation-buttons :global(button.selected) {
-  background-color: #7A0019;
-  color: white;
-  border-color: #0077cc;
+    outline: 2px solid #7A0019;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px #fff;
 }
 
 .equation-buttons button {
