@@ -203,7 +203,7 @@ function startOver() {
     flex-wrap: wrap;
     gap: 12px;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 30px;
   }
 
   .unit-buttons button,
@@ -294,7 +294,7 @@ function startOver() {
   .completed-message h2 {
   color: black;
   font-weight: bold;
-  font-size: 1.5rem; /* You can adjust this size as needed */
+  font-size: 1.5rem;
 }
 
 
@@ -311,6 +311,13 @@ function startOver() {
 }
 .start-over-btn:hover {
   background-color: #9c0033;
+  
+}
+
+.practice-container h2 {
+  text-align: center;
+  font-size: 1.5rem;   /* increase heading size */
+  font-weight: 700;
   
 }
 
