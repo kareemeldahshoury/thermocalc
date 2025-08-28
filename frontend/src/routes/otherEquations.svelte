@@ -10,10 +10,10 @@
       id: 'refEfficency',
       title: 'Refrigeration COP',
       variables: [
-        { id: 'COP', label: 'Coefficient of Performance <i>(COP)</i>', placeholder: 'e.g., 2.5' },
-        { id: 'Qc',  label: 'Cooling Load <i>(Q<sub>c</sub>, kW)</i>',  placeholder: 'e.g., 500' },
-        { id: 'Qh',  label: 'Heat Rejected <i>(Q<sub>h</sub>, kW)</i>', placeholder: 'e.g., 800' },
-        { id: 'Wnet', label: 'Net Work <i>(W<sub>net</sub>, kW)</i>', placeholder: 'e.g., 800' },
+        { id: 'COP', label: 'Coefficient of Performance (COP)', placeholder: 'e.g., 2.5' },
+        { id: 'Qc',  label: 'Cooling Load (Q<sub>c</sub>, kW)',  placeholder: 'e.g., 500' },
+        { id: 'Qh',  label: 'Heat Rejected (Q<sub>h</sub>, kW)', placeholder: 'e.g., 800' },
+        { id: 'Wnet', label: 'Net Work (W<sub>net</sub>, kW)', placeholder: 'e.g., 800' },
       ]
     },
     {
@@ -218,7 +218,6 @@
   {#if currentEq}
   <span id="solvefor-label" class="group-label">What do you want to solve for?</span>
   <div class="var-buttons" role="group" aria-labelledby="solvefor-label">
-    <!-- Always show 4 buttons for COP, Qc, Qh, Wnet -->
     <button
       type="button"
       class:active={solveFor === 'COP'}
@@ -245,9 +244,7 @@
   </div>
 
   {#if solveFor}
-    <!-- Render inputs -->
     {#if solveFor === 'COP' || solveFor === 'Qc'}
-      <!-- Inputs for Qc and Qh, with toggle -->
       <label for="var-Qc">Cooling Load <span class="small"><i>(Q<sub>c</sub>, kW)</i></span></label>
       <input id="var-Qc" type="text" bind:value={inputs.Qc} placeholder="e.g., 500" />
 
@@ -264,7 +261,7 @@
           type="button"
           class="swap-btn"
           on:click={() => { useWorkInstead = !useWorkInstead; inputs = {}; }}>
-          {useWorkInstead ? 'Use Qh instead' : 'Use Work Input instead'}
+          {@html useWorkInstead ? 'Use Q<sub>h</sub>' : 'Use W<sub>net</sub>'}
         </button>
       </div>
 
@@ -275,18 +272,17 @@
         placeholder={useWorkInstead ? 'e.g., 150' : 'e.g., 800'} />
 
     {:else if solveFor === 'Qh'}
-      <!-- Inputs for COP and Qc -->
-      <label for="var-COP">Coefficient of Performance <span class="small"><i>(COP)</i></span></label>
+      <label for="var-COP">Coefficient of Performance <span class="small">(COP)</span></label>
       <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 2.5" />
 
-      <label for="var-Qc">Cooling Load <span class="small"><i>(Q<sub>c</sub>, kW)</i></span></label>
+      <label for="var-Qc">Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span></label>
       <input id="var-Qc" type="text" bind:value={inputs.Qc} placeholder="e.g., 500" />
 
     {:else if solveFor === 'Wnet'}
-      <label for="var-COP">Coefficient of Performance <span class="small"><i>(COP)</i></span></label>
+      <label for="var-COP">Coefficient of Performance <span class="small">(COP)</span></label>
       <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 2.5" />
 
-      <label for="var-Qc">Cooling Load <span class="small"><i>(Q<sub>c</sub>, kW)</i></span></label>
+      <label for="var-Qc">Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span></label>
       <input id="var-Qc" type="text" bind:value={inputs.Qc} placeholder="e.g., 500" />
     {/if}
 
@@ -370,6 +366,7 @@
     font-weight: 700;
   }
   .small { font-size: .85em; color: #555; }
+
   select, input {
     width: 100%;
     padding: 10px;
@@ -404,12 +401,14 @@
     transition: transform .05s ease, background .2s;
   }
   .var-buttons button.active,
+
   .var-buttons button:focus-visible {
     outline: 2px solid #7A0019;
     outline-offset: 2px;
     box-shadow: 0 0 0 2px #fff;
   }
   .var-buttons button:active { transform: translateY(1px); }
+
   .calculate-btn {
     background: #7A0019;
     color: #fff;
@@ -423,6 +422,7 @@
     margin-top: 35px;
   }
   .calculate-btn:hover { background: #9c0033; }
+
   .error-bar {
     color: #fff;
     background-color: #b00020;
@@ -433,6 +433,7 @@
     text-align: center;
   }
   .result-info { margin-top: 18px; }
+
   table {
     width: 100%;
     margin-top: 14px;
@@ -467,4 +468,9 @@
     margin-top: 42px;
   }
   .label-row label { margin: 0; }
+
+  .small i, label i {
+  font-style: normal;
+}
+
 </style>
