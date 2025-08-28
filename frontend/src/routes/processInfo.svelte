@@ -10,7 +10,7 @@
       properties: [
         "Pressure (P) = constant",
         "Heat added goes into changing internal energy and doing boundary work",
-        "Work: W = P(V₂ − V₁)",
+        "Work: W = P ( V₂ − V₁ )",
         "Q ≠ 0, ΔU ≠ 0, W ≠ 0"
       ]
     },
@@ -28,7 +28,7 @@
       properties: [
         "Temperature (T) = constant",
         "ΔU = 0 for ideal gases",
-        "Work: W = nRT ln(V₂ / V₁)",
+        'Work: W = nRT · ln( <span class="frac"><span class="num">V₂</span><span class="den">V₁</span></span> )',
         "Q = W"
       ]
     },
@@ -37,7 +37,7 @@
       properties: [
         "Q = 0",
         "Entropy may change (irreversible) or stay constant (reversible)",
-        "Work: W = (P₂V₂ − P₁V₁) / (1 − γ) = (nR(T₁ − T₂)) / (γ − 1)",
+        'Work: W = <span class="frac"><span class="num">P₂V₂ − P₁V₁</span><span class="den">1 − γ</span></span> = <span class="frac"><span class="num">nR(T₁ − T₂)</span><span class="den">γ − 1</span></span>',
         "For ideal gases: PV^γ = constant"
       ]
     },
@@ -45,16 +45,16 @@
       title: "Isentropic (Adiabatic + Reversible)",
       properties: [
         "Q = 0, ΔS = 0",
-        "Work: W = (P₂V₂ − P₁V₁)/(1 - γ)",
-        "Also: W = (m * R * (T₁ − T₂)) / (γ − 1)",
-        "PV^γ = constant, TV^{γ−1} = constant"
+        'Work: W = <span class="frac"><span class="num">P₂V₂ − P₁V₁</span><span class="den">1 − γ</span></span>',
+        'Also: W = <span class="frac"><span class="num">mR (T₁ − T₂)</span><span class="den">γ − 1</span></span>',
+        "PV<sup>γ</sup> = constant, TV<sup>γ−1</sup> = constant"
       ]
     },
     {
       title: "Polytropic",
       properties: [
         "PVⁿ = constant",
-        "Work: W = (P₂V₂ − P₁V₁) / (1 − n)",
+        'Work: W = <span class="frac"><span class="num">P₂V₂ − P₁V₁</span><span class="den">1 − n</span></span>',
         "n ≠ 1: Use polytropic formula",
         "n = 1: Reduces to isothermal"
       ]
@@ -99,6 +99,32 @@
     list-style: none;
     padding: 2px 0;
   }
+
+  :global(.frac) {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    vertical-align: middle;
+    font-size: 0.95em;
+  }
+
+  :global(.frac .num) {
+    display: block;
+    padding: 0 .15em;
+  }
+
+  :global(.frac .den) {
+    display: block;
+    border-top: 1px solid currentColor;
+    margin-top: .1em;
+    padding: .1em .15em 0;
+  }
+
+  :global(sup) {
+    font-size: 0.75em;
+    vertical-align: super;
+  }
 </style>
 
 <div class="container">
@@ -107,7 +133,7 @@
       <h3>{group.title}</h3>
       <ul>
         {#each group.properties as item}
-          <li>{item}</li>
+          <li>{@html item}</li>
         {/each}
       </ul>
     </div>
