@@ -5,6 +5,7 @@ from .ref_cop import solve_ref_cop
 from .erbSteadyState import solve_erb_steady_state
 from .ccEff import solve_carnot_efficiency
 from .hp_cop import solve_hp_cop
+from .massFlowRate import solve_mass_flow_rate
 
 
 
@@ -12,7 +13,8 @@ GENERAL_SOLVERS: Dict[str, Callable[[str, Dict[str, float]], Any]] = {
     "refEfficency": solve_ref_cop,
     "erb1SteadyState": solve_erb_steady_state,
     "carnotEfficiency": solve_carnot_efficiency,
-    "heatPumpEfficiency" : solve_hp_cop
+    "heatPumpEfficiency" : solve_hp_cop,
+    "massFlowRate" : solve_mass_flow_rate,
 
 }
 

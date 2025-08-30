@@ -36,6 +36,16 @@
       ]
     },
     {
+      id: 'massFlowRate',
+      title: 'Mass Flow Rate from Specific Volume',
+      variables: [
+        { id: 'mdot', label: 'Mass Flow Rate', placeholder: 'e.g., 2.5' },
+        { id: 'V', label: 'Velocity', placeholder: 'e.g., 0.01' },
+        { id: 'A', label: 'Area', placeholder: 'e.g., 4.2'},
+        { id: 'v',    label: 'Specific Volume', placeholder: 'e.g., 0.005' },
+      ]
+    },
+    {
       id: 'erb1SteadyState',
       title: 'Energy Rate Balance at Steady State (1 inlet/1 outlet)',
       variables: [
@@ -59,7 +69,13 @@
       Qdot: 'kW', Wdot: 'kW', mdot: 'kg/s',
       h1: 'kJ/kg', h2: 'kJ/kg', V1: 'm/s', V2: 'm/s', z1: 'm', z2: 'm'
     },
-    carnotEfficiency: { TH: 'K', TL: 'K', ccEff: '' }
+    carnotEfficiency: { TH: 'K', TL: 'K', ccEff: '' },
+    massFlowRate: {
+      mdot: 'kg/s',
+      V: 'm/s',
+      A: 'm²',
+      v: 'm³/kg'
+    }
   };
 
   const SYMBOLS: Record<string, Record<string, string>> = {
@@ -86,7 +102,14 @@
       z1: 'z<sub>1</sub>',
       z2: 'z<sub>2</sub>'
     },
-    carnotEfficiency: { TH: 'T<sub>H</sub>', TL: 'T<sub>L</sub>', ccEff: 'η' }
+    carnotEfficiency: { TH: 'T<sub>H</sub>', TL: 'T<sub>L</sub>', ccEff: 'η' },
+    massFlowRate: {
+      mdot: 'ṁ',
+      V: 'V',
+      A: 'A',
+      v: 'v̅'
+    }
+
   };
 
   function symbolFor(eqId: string, varId: string): string {
@@ -135,7 +158,7 @@
   if (solveFor === "Wnet") return ["COP", "Qh"];
 }
 
-  if (eqId === "erb1SteadyState" || eqId === "carnotEfficiency") {
+  if (eqId === "erb1SteadyState" || eqId === "carnotEfficiency" || eqId == "massFlowRate") {
     return activeVariables.map(v => v.id).filter(id => id !== solveFor);
   }
 
