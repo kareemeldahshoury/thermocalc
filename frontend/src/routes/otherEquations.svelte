@@ -4,6 +4,7 @@
   type EqDef = { id: string; title: string; variables: VarDef[] };
 
   let useWorkInstead = false;
+  let searchText = "";
 
   const EQUATIONS: EqDef[] = [
     {
@@ -229,15 +230,25 @@
   <h2>General Equations Calculator</h2>
 
   <label for="eq">Select Calculation:</label>
-  <select id="eq" bind:value={selectedEqId} on:change={() => {
-    const eq = EQUATIONS.find(e => e.id === selectedEqId);
-    if (eq) resetForm(eq);
-  }}>
-    <option value="">-- Choose --</option>
-    {#each EQUATIONS as eq}
-      <option value={eq.id}>{eq.title}</option>
-    {/each}
-  </select>
+<input
+  list="equationOptions"
+  id="eqDropdown"
+  bind:value={searchText}
+  placeholder="Type or choose a calculation..."
+  on:change={() => {
+    const match = EQUATIONS.find(e => e.title === searchText);
+    if (match) selectedEqId = match.id;
+    solveFor = ""
+  }}
+  on:focus={(e) => (e.target as HTMLInputElement).select()}
+/>
+
+<datalist id="equationOptions">
+  {#each EQUATIONS as eq}
+    <option value={eq.title}>{eq.title}</option>
+  {/each}
+</datalist>
+
 
   {#if currentEq}
     <span id="solvefor-label" class="group-label">What do you want to solve for?</span>
@@ -501,7 +512,7 @@
   }
   .small { font-size: .85em; color: #555; }
 
-  select, input {
+  input {
     width: 100%; padding: 10px; font-size: 1rem;
     border-radius: 6px; border: 1px solid #ccc;
     background: #f2f2f2; color: #333; margin-top: 6px;
