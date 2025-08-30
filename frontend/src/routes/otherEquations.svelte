@@ -1,11 +1,30 @@
 <script lang="ts">
-  // ---------- Types ----------
+
   type VarDef = { id: string; label: string; placeholder?: string };
   type EqDef = { id: string; title: string; variables: VarDef[] };
 
   let useWorkInstead = false;
 
   const EQUATIONS: EqDef[] = [
+    {
+      id: 'carnotEfficiency',
+      title: 'Ideal Carnot Cycle Efficiency',
+      variables: [
+        { id: 'ccEff', label: 'Carnot Efficiency', placeholder: 'e.g., 0.5' },
+        { id: 'TH', label: 'High Temperature Reservoir', placeholder: 'e.g., 600' },
+        { id: 'TL', label: 'Low Temperature Reservoir', placeholder: 'e.g., 300' },
+      ]
+    },
+    {
+      id: 'heatPumpEfficiency',
+      title: 'Heat Pump COP',
+      variables: [
+        { id: 'COP', label: 'Coefficient of Performance', placeholder: 'e.g., 4.0' },
+        { id: 'Qh',  label: 'Heat Delivered', placeholder: 'e.g., 800' },
+        { id: 'Qc',  label: 'Cooling Load', placeholder: 'e.g., 500' },
+        { id: 'Wnet', label: 'Net Work', placeholder: 'e.g., 300' },
+      ]
+    },
     {
       id: 'refEfficency',
       title: 'Refrigeration COP',
@@ -27,23 +46,31 @@
         { id: 'h2',   label: 'Exit Enthalpy',   placeholder: 'e.g., 2600' },
         { id: 'V1',   label: 'Inlet Velocity',    placeholder: 'e.g., 30' },
         { id: 'V2',   label: 'Exit Velocity',     placeholder: 'e.g., 10' },
-        { id: 'z1',   label: 'Inlet Elevation',     placeholder: 'e.g., 12' },
-        { id: 'z2',   label: 'Exit Elevation',      placeholder: 'e.g., 3' }
+        { id: 'z1',   label: 'Inlet Elevation',   placeholder: 'e.g., 12' },
+        { id: 'z2',   label: 'Exit Elevation',    placeholder: 'e.g., 3' }
       ]
     }
   ];
 
   const UNITS: Record<string, Record<string, string>> = {
     refEfficency: { COP: '', Qc: 'kW', Qh: 'kW', Wnet: 'kW' },
+    heatPumpEfficiency: { COP: '', Qc: 'kW', Qh: 'kW', Wnet: 'kW' },
     erb1SteadyState: {
       Qdot: 'kW', Wdot: 'kW', mdot: 'kg/s',
       h1: 'kJ/kg', h2: 'kJ/kg', V1: 'm/s', V2: 'm/s', z1: 'm', z2: 'm'
-    }
+    },
+    carnotEfficiency: { TH: 'K', TL: 'K', ccEff: '' }
   };
 
   const SYMBOLS: Record<string, Record<string, string>> = {
     refEfficency: {
-      COP: 'COP',
+      COP: 'COP<sub>R</sub>',
+      Qc: 'Q<sub>c</sub>',
+      Qh: 'Q<sub>h</sub>',
+      Wnet: 'W<sub>net</sub>'
+    },
+    heatPumpEfficiency: {
+      COP: 'COP<sub>HP</sub>',
       Qc: 'Q<sub>c</sub>',
       Qh: 'Q<sub>h</sub>',
       Wnet: 'W<sub>net</sub>'
@@ -58,7 +85,8 @@
       V2: 'V<sub>2</sub>',
       z1: 'z<sub>1</sub>',
       z2: 'z<sub>2</sub>'
-    }
+    },
+    carnotEfficiency: { TH: 'T<sub>H</sub>', TL: 'T<sub>L</sub>', ccEff: 'η' }
   };
 
   function symbolFor(eqId: string, varId: string): string {
@@ -73,7 +101,6 @@
     return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
   }
 
-  // ---------------- State ----------------
   let selectedEqId = '';
   let solveFor = '';
   let inputs: Record<string, string> = {};
@@ -93,21 +120,29 @@
     useWorkInstead = false;
   }
 
-  // ---------------- Required inputs ----------------
   function requiredInputs(eqId: string, solveFor: string): string[] {
-    if (eqId === "refEfficency") {
-      if (solveFor === "COP") return ["Qc", useWorkInstead ? "Wnet" : "Qh"];
-      if (solveFor === "Qc") return ["COP", useWorkInstead ? "Wnet" : "Qh"];
-      if (solveFor === "Qh") return ["COP", "Qc"];
-      if (solveFor === "Wnet") return ["COP", "Qc"];
-    }
-    if (eqId === "erb1SteadyState") {
-      return activeVariables.map(v => v.id).filter(id => id !== solveFor);
-    }
-    return [];
+  if (eqId === "refEfficency") {
+    if (solveFor === "COP") return ["Qc", useWorkInstead ? "Wnet" : "Qh"];
+    if (solveFor === "Qc") return ["COP", useWorkInstead ? "Wnet" : "Qh"];
+    if (solveFor === "Qh") return ["COP", "Qc"];
+    if (solveFor === "Wnet") return ["COP", "Qc"];
   }
 
-  // ---------------- Calculate ----------------
+  if (eqId === "heatPumpEfficiency") {
+  if (solveFor === "COP") return ["Qh", useWorkInstead ? "Wnet" : "Qc"];
+  if (solveFor === "Qh") return ["COP", useWorkInstead ? "Wnet" : "Qc"];
+  if (solveFor === "Qc") return ["COP", "Qh"];
+  if (solveFor === "Wnet") return ["COP", "Qh"];
+}
+
+  if (eqId === "erb1SteadyState" || eqId === "carnotEfficiency") {
+    return activeVariables.map(v => v.id).filter(id => id !== solveFor);
+  }
+
+  return [];
+}
+
+
   async function calculate() {
     errorMsg = '';
     resultMessage = '';
@@ -167,7 +202,6 @@
   }
 </script>
 
-
 <div class="container">
   <h2>General Equations Calculator</h2>
 
@@ -224,7 +258,10 @@
             <button
               type="button"
               class="swap-btn"
-              on:click={() => { useWorkInstead = !useWorkInstead; inputs = {}; }}
+              on:click={() => { useWorkInstead = !useWorkInstead; inputs = {}; 
+              resultMessage = "";
+              errorMsg = ""}
+            }
             >
               {@html useWorkInstead ? 'Use Q<sub>h</sub>' : 'Use W<sub>net</sub>'}
             </button>
@@ -252,7 +289,12 @@
             <button
               type="button"
               class="swap-btn"
-              on:click={() => { useWorkInstead = !useWorkInstead; inputs = {}; }}
+              on:click={() => {
+                useWorkInstead = !useWorkInstead;
+                inputs = {};
+                resultMessage = ''; 
+                errorMsg = ''; 
+              }}
             >
               {@html useWorkInstead ? 'Use Q<sub>h</sub>' : 'Use W<sub>net</sub>'}
             </button>
@@ -279,7 +321,7 @@
           <label for="var-Qc">Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span></label>
           <input id="var-Qc" type="text" bind:value={inputs.Qc} placeholder="e.g., 500" />
         {/if}
-      {:else}
+      {:else if selectedEqId !== 'heatPumpEfficiency'}
         {#each activeVariables as v}
           {#if v.id !== solveFor}
             <label for={"var-" + v.id}>
@@ -292,9 +334,99 @@
           {/if}
         {/each}
       {/if}
-
+     {#if selectedEqId !== 'heatPumpEfficiency'}
       <button class="calculate-btn" on:click={calculate}>Calculate</button>
+      {/if}
     {/if}
+
+    {#if selectedEqId === 'heatPumpEfficiency'}
+    {#if solveFor}
+      {#if solveFor === 'COP'}
+        <label for="var-Qh">Heat Delivered <span class="small">(Q<sub>h</sub>, kW)</span></label>
+        <input id="var-Qh" type="text" bind:value={inputs.Qh} placeholder="e.g., 800" />
+
+        <div class="label-row">
+          <label for="var-Qc">
+            {#if useWorkInstead}
+              Net Work <span class="small">(W<sub>net</sub>, kW)</span>
+            {:else}
+              Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span>
+            {/if}
+          </label>
+
+          <button
+            type="button"
+            class="swap-btn"
+            on:click={() => { useWorkInstead = !useWorkInstead; inputs = {}; 
+            resultMessage = "";
+            errorMsg = ""}}
+          >
+            {@html useWorkInstead ? 'Use Q<sub>c</sub>' : 'Use W<sub>net</sub>'}
+          </button>
+        </div>
+
+        <input
+          id="var-Qc"
+          type="text"
+          bind:value={inputs[useWorkInstead ? 'Wnet' : 'Qc']}
+          placeholder={useWorkInstead ? 'e.g., 500' : 'e.g., 300'}
+        />
+
+      {:else if solveFor === 'Qc'}
+        <label for="var-COP">Coefficient of Performance <span class="small">(COP<sub>HP</sub>)</span></label>
+        <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 4.0" />
+
+        <label for="var-Qh">Heat Delivered <span class="small">(Q<sub>h</sub>, kW)</span></label>
+        <input id="var-Qh" type="text" bind:value={inputs.Qh} placeholder="e.g., 800" />
+
+      {:else if solveFor === 'Qh'}
+        <label for="var-COP">Coefficient of Performance <span class="small">(COP<sub>HP</sub>)</span></label>
+        <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 4.0" />
+
+        <div class="label-row">
+          <label for="var-Qc">
+            {#if useWorkInstead}
+              Net Work <span class="small">(W<sub>net</sub>, kW)</span>
+            {:else}
+              Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span>
+            {/if}
+          </label>
+
+          <button
+              type="button"
+              class="swap-btn"
+              on:click={() => {
+                useWorkInstead = !useWorkInstead;
+                inputs = {};
+                resultMessage = ''; // clear result when swapping
+                errorMsg = '';      // clear any errors too
+              }}
+            >
+              {@html useWorkInstead ? 'Use Q<sub>c</sub>' : 'Use W<sub>net</sub>'}
+          </button>
+        </div>
+
+        <input
+          id="var-Qc"
+          type="text"
+          bind:value={inputs[useWorkInstead ? 'Wnet' : 'Qc']}
+          placeholder={useWorkInstead ? 'e.g., 500' : 'e.g., 300'}
+        />
+
+      {:else if solveFor === 'Wnet'}
+        <label for="var-COP">Coefficient of Performance <span class="small">(COP<sub>HP</sub>)</span></label>
+        <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 4.0" />
+
+        <label for="var-Qh">Heat Delivered <span class="small">(Q<sub>h</sub>, kW)</span></label>
+        <input id="var-Qh" type="text" bind:value={inputs.Qh} placeholder="e.g., 800" />
+
+      {/if}
+      <button class="calculate-btn" on:click={calculate}>Calculate</button>
+      {/if}
+
+    {/if}
+
+
 
     {#if errorMsg}
       <p class="error-bar">{errorMsg}</p>
@@ -407,7 +539,6 @@
   justify-content: space-between;
   align-items: center;     
   margin-top: 33px;
-
 
 }
 
