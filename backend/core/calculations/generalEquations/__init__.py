@@ -6,6 +6,7 @@ from .erbSteadyState import solve_erb_steady_state
 from .ccEff import solve_carnot_efficiency
 from .hp_cop import solve_hp_cop
 from .massFlowRate import solve_mass_flow_rate
+from .idealGasLaw import solve_ideal_gas_law
 
 
 
@@ -15,6 +16,7 @@ GENERAL_SOLVERS: Dict[str, Callable[[str, Dict[str, float]], Any]] = {
     "carnotEfficiency": solve_carnot_efficiency,
     "heatPumpEfficiency" : solve_hp_cop,
     "massFlowRate" : solve_mass_flow_rate,
+    "idealGasLaw" : solve_ideal_gas_law
 
 }
 

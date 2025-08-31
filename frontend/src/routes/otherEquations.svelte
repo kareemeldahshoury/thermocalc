@@ -149,6 +149,13 @@
     return SYMBOLS[eqId]?.[varId] ?? varId;
   }
 
+  function labelFor(eqId: string, varId: string): string {
+    const eq = EQUATIONS.find(e => e.id === eqId);
+    const variable = eq?.variables.find(v => v.id === varId);
+    return variable?.label ?? varId;
+}
+
+
   function unitFor(eqId: string, varId: string): string {
     return UNITS[eqId]?.[varId] ?? '';
   }
@@ -275,7 +282,14 @@ if (eqId === "idealGasLaw") {
   id="eqDropdown"
   bind:value={selectedEqId}
   on:change={() => {
+    // Reset calculation state
     solveFor = "";
+    inputs = {};
+    resultMessage = "";  
+    errorMsg = "";
+    useWorkInstead = false;
+
+    // validate equation exists
     const match = EQUATIONS.find(e => e.id === selectedEqId);
     if (!match) {
       selectedEqId = "";
@@ -287,6 +301,7 @@ if (eqId === "idealGasLaw") {
     <option value={eq.id}>{eq.title}</option>
   {/each}
 </select>
+
 
 
 
@@ -536,26 +551,56 @@ if (eqId === "idealGasLaw") {
 
 
     {#if errorMsg}
-      <p class="error-bar">{errorMsg}</p>
-    {/if}
+  <p class="error-bar">{errorMsg}</p>
+{/if}
 
-    {#if resultMessage && !errorMsg}
-      <div class="result-info">
-        <strong>Result:</strong>
-        {#if typeof resultMessage === 'object' && resultMessage !== null && !Array.isArray(resultMessage)}
-          <table>
-            <thead><tr>{#each Object.entries(resultMessage) as [key, _]}<th>{@html symbolFor(selectedEqId, key)}</th>{/each}</tr></thead>
-            <tbody><tr>{#each Object.entries(resultMessage) as [key, val]}<td>{#if typeof val === 'number'}{formatNumber(val)} {unitFor(selectedEqId, key)}{:else}{val}{/if}</td>{/each}</tr></tbody>
-          </table>
-        {:else if typeof resultMessage === 'number'}
-          <table>
-            <thead><tr><th>{@html symbolFor(selectedEqId, solveFor)}</th></tr></thead>
-            <tbody><tr><td>{formatNumber(resultMessage)} {unitFor(selectedEqId, solveFor)}</td></tr></tbody>
-          </table>
-        {/if}
-      </div>
+{#if resultMessage !== "" && !errorMsg}
+  <div class="result-info">
+    <strong>Result:</strong>
+    {#if typeof resultMessage === 'object' && resultMessage !== null && !Array.isArray(resultMessage)}
+      <table>
+        <thead>
+          <tr>
+            {#each Object.entries(resultMessage) as [key, _]}
+              <th>
+                {@html labelFor(selectedEqId, key)}
+              </th>
+            {/each}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {#each Object.entries(resultMessage) as [key, val]}
+              <td>
+                {#if typeof val === 'number'}
+                  {formatNumber(val)} {unitFor(selectedEqId, key)}
+                {:else}
+                  {val}
+                {/if}
+              </td>
+            {/each}
+          </tr>
+        </tbody>
+      </table>
+    {:else if typeof resultMessage === 'number'}
+      <table>
+        <thead>
+          <tr>
+            <th>
+              {@html labelFor(selectedEqId, solveFor)}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{formatNumber(resultMessage)} {unitFor(selectedEqId, solveFor)}</td>
+          </tr>
+        </tbody>
+      </table>
     {/if}
-  {/if}
+  </div>
+{/if}
+{/if}
 </div>
 
 <style>
