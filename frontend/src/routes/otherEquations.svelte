@@ -30,10 +30,10 @@
       id: 'refEfficency',
       title: 'Refrigeration COP',
       variables: [
-        { id: 'COP', label: 'Coefficient of Performance (COP)', placeholder: 'e.g., 2.5' },
-        { id: 'Qc',  label: 'Cooling Load (Q<sub>c</sub>, kW)',  placeholder: 'e.g., 500' },
-        { id: 'Qh',  label: 'Heat Rejected (Q<sub>h</sub>, kW)', placeholder: 'e.g., 800' },
-        { id: 'Wnet', label: 'Net Work (W<sub>net</sub>, kW)', placeholder: 'e.g., 800' },
+        { id: 'COP', label: 'Coefficient of Performance', placeholder: 'e.g., 2.5' },
+        { id: 'Qc',  label: 'Cooling Load',  placeholder: 'e.g., 500' },
+        { id: 'Qh',  label: 'Heat Rejected', placeholder: 'e.g., 800' },
+        { id: 'Wnet', label: 'Net Work', placeholder: 'e.g., 800' },
       ]
     },
     {
@@ -556,7 +556,6 @@ if (eqId === "idealGasLaw") {
 
 {#if resultMessage !== "" && !errorMsg}
   <div class="result-info">
-    <strong>Result:</strong>
     {#if typeof resultMessage === 'object' && resultMessage !== null && !Array.isArray(resultMessage)}
       <table>
         <thead>
@@ -564,6 +563,7 @@ if (eqId === "idealGasLaw") {
             {#each Object.entries(resultMessage) as [key, _]}
               <th>
                 {@html labelFor(selectedEqId, key)}
+                <span class="small">({@html symbolFor(selectedEqId, key)})</span>
               </th>
             {/each}
           </tr>
@@ -588,6 +588,7 @@ if (eqId === "idealGasLaw") {
           <tr>
             <th>
               {@html labelFor(selectedEqId, solveFor)}
+              <span class="small">({@html symbolFor(selectedEqId, solveFor)})</span>
             </th>
           </tr>
         </thead>
