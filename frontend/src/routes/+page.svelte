@@ -24,13 +24,11 @@
   },
   {
     title: 'Search Thermodynamics Tables Instantly',
-    subtitle: 'Quick, accurate results for students and engineers',
     cta: 'Try the Tables Calculator',
     targetCalculator: 'calc2'
   },
   {
     title: 'Master Work Equations',
-    subtitle: 'Adiabatic, polytropic, isothermal, and more',
     cta: 'Try the Work Calculator',
     targetCalculator: 'calc3'
   }
@@ -362,34 +360,34 @@ onMount(() => {
 
 .carousel-banner {
   background: linear-gradient(to right, #7A0019, #f78b00);
-  padding: 20px 10px;
+  padding: 10px 10px;
   text-align: center;
   color: white;
   transition: all 0.6s ease-in-out;
-  height: 190px;
+  height: 130px;
   overflow: hidden
 }
 
 
 .carousel-logo {
-  height: 110px; 
+  height: 90px; 
   max-width: none;     
   margin: 0 auto 20px auto;
   display: block;
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
 
 
 .carousel-banner h1 {
-  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  font-size: clamp(1.2rem, 2vw, 1.75rem);
   font-weight: 800;
   margin-bottom: 12px;
 }
 
 .carousel-banner p {
-  font-size: clamp(0.95rem, 1.6vw, 1.05rem);
-  margin-bottom: 20px;
+  font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+  margin-bottom: 15px;
 }
 
 .cta-btn {
@@ -397,8 +395,8 @@ onMount(() => {
   color: #7A0019;
   font-weight: bold;
   border: none;
-  padding: 12px 24px;
-  font-size: 1rem;
+  padding: 10px 20px;
+  font-size: .8rem;
   border-radius: 30px;
   cursor: pointer;
   transition: background 0.3s ease;

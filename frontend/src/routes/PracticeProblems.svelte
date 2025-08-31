@@ -187,11 +187,13 @@ function startOver() {
 
   .practice-container {
     max-width: 800px;
-    margin: 40px auto;
-    padding: 30px;
-    background: white;
+    margin: -10px auto;
+    padding: 30px 30px 35px 30px;
+    background-color: white;
+    color: #000;
     border-radius: 12px;
-    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    font-family: system-ui, sans-serif;
   }
 
   h2 {

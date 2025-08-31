@@ -60,7 +60,21 @@
         { id: 'z1',   label: 'Inlet Elevation',   placeholder: 'e.g., 12' },
         { id: 'z2',   label: 'Exit Elevation',    placeholder: 'e.g., 3' }
       ]
+    },
+    {
+      id: 'idealGasLaw',
+      title: 'Ideal Gas Law',
+      variables: [
+        { id: 'P', label: 'Pressure', placeholder: 'e.g., 101325' },
+        { id: 'V', label: 'Volume', placeholder: 'e.g., 0.1' },
+        { id: 'T', label: 'Temperature', placeholder: 'e.g., 300' },
+        { id: 'n', label: 'Moles', placeholder: 'e.g., 2' },
+        { id: 'm', label: 'Mass', placeholder: 'e.g., 0.058' },
+        { id: 'M', label: 'Molar Mass', placeholder: 'e.g., 0.029' }
+      ]
     }
+
+      
   ];
 
   const UNITS: Record<string, Record<string, string>> = {
@@ -76,7 +90,16 @@
       V: 'm/s',
       A: 'm²',
       v: 'm³/kg'
-    }
+    },
+    idealGasLaw: {
+      P: 'Pa',
+      V: 'm³',
+      T: 'K',
+      n: 'mol',
+      m: 'kg',
+      M: 'kg/mol'
+    },
+
   };
 
   const SYMBOLS: Record<string, Record<string, string>> = {
@@ -109,7 +132,16 @@
       V: 'V',
       A: 'A',
       v: 'v̅'
+    },
+    idealGasLaw: {
+      P: 'P',
+      V: 'V',
+      T: 'T',
+      n: 'n',
+      m: 'm',
+      M: 'M'
     }
+
 
   };
 
@@ -157,6 +189,15 @@
   if (solveFor === "Qh") return ["COP", useWorkInstead ? "Wnet" : "Qc"];
   if (solveFor === "Qc") return ["COP", "Qh"];
   if (solveFor === "Wnet") return ["COP", "Qh"];
+}
+if (eqId === "idealGasLaw") {
+  if (solveFor === "P") return ["V", "T", useWorkInstead ? "m" : "n", ...(useWorkInstead ? ["M"] : [])];
+  if (solveFor === "V") return ["P", "T", useWorkInstead ? "m" : "n", ...(useWorkInstead ? ["M"] : [])];
+  if (solveFor === "T") return ["P", "V", useWorkInstead ? "m" : "n", ...(useWorkInstead ? ["M"] : [])];
+
+  if (solveFor === "n") return ["P", "V", "T"];
+  if (solveFor === "m") return ["P", "V", "T", "M"];
+  if (solveFor === "M") return ["P", "V", "T", "m"];
 }
 
   if (eqId === "erb1SteadyState" || eqId === "carnotEfficiency" || eqId == "massFlowRate") {
@@ -229,25 +270,24 @@
 <div class="container">
   <h2>General Equations Calculator</h2>
 
-  <label for="eq">Select Calculation:</label>
-<input
-  list="equationOptions"
+<label for="eqDropdown">Select Calculation:</label>
+<select
   id="eqDropdown"
-  bind:value={searchText}
-  placeholder="Type or choose a calculation..."
+  bind:value={selectedEqId}
   on:change={() => {
-    const match = EQUATIONS.find(e => e.title === searchText);
-    if (match) selectedEqId = match.id;
-    solveFor = ""
+    solveFor = "";
+    const match = EQUATIONS.find(e => e.id === selectedEqId);
+    if (!match) {
+      selectedEqId = "";
+    }
   }}
-  on:focus={(e) => (e.target as HTMLInputElement).select()}
-/>
-
-<datalist id="equationOptions">
+>
+  <option value="" disabled selected>Select an option...</option>
   {#each EQUATIONS as eq}
-    <option value={eq.title}>{eq.title}</option>
+    <option value={eq.id}>{eq.title}</option>
   {/each}
-</datalist>
+</select>
+
 
 
   {#if currentEq}
@@ -269,196 +309,229 @@
     </button>
   {/each}
 </div>
+{#if solveFor}
+  {#if selectedEqId === 'refEfficency'}
+    {#if solveFor === 'COP'}
+      <label for="var-Qc">Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span></label>
+      <input id="var-Qc" type="text" bind:value={inputs.Qc} placeholder="e.g., 500" />
 
-
-
-
-
-    {#if solveFor}
-      {#if selectedEqId === 'refEfficency'}
-        {#if solveFor === 'COP'}
-          <label for="var-Qc">Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span></label>
-          <input id="var-Qc" type="text" bind:value={inputs.Qc} placeholder="e.g., 500" />
-
-          <div class="label-row">
-            <label for="var-Qh">
-              {#if useWorkInstead}
-                Net Work <span class="small">(W<sub>net</sub>, kW)</span>
-              {:else}
-                Heat Rejected <span class="small">(Q<sub>h</sub>, kW)</span>
-              {/if}
-            </label>
-
-            <button
-              type="button"
-              class="swap-btn"
-              on:click={() => { useWorkInstead = !useWorkInstead; inputs = {}; 
-              resultMessage = "";
-              errorMsg = ""}
-            }
-            >
-              {@html useWorkInstead ? 'Use Q<sub>h</sub>' : 'Use W<sub>net</sub>'}
-            </button>
-          </div>
-          <input
-            id="var-Qh"
-            type="text"
-            bind:value={inputs[useWorkInstead ? 'Wnet' : 'Qh']}
-            placeholder={useWorkInstead ? 'e.g., 150' : 'e.g., 800'}
-          />
-
-        {:else if solveFor === 'Qc'}
-          <label for="var-COP">Coefficient of Performance <span class="small">(COP)</span></label>
-          <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 500" />
-
-          <div class="label-row">
-            <label for="var-Qh">
-              {#if useWorkInstead}
-                Net Work <span class="small">(W<sub>net</sub>, kW)</span>
-              {:else}
-                Heat Rejected <span class="small">(Q<sub>h</sub>, kW)</span>
-              {/if}
-            </label>
-
-            <button
-              type="button"
-              class="swap-btn"
-              on:click={() => {
-                useWorkInstead = !useWorkInstead;
-                inputs = {};
-                resultMessage = ''; 
-                errorMsg = ''; 
-              }}
-            >
-              {@html useWorkInstead ? 'Use Q<sub>h</sub>' : 'Use W<sub>net</sub>'}
-            </button>
-          </div>
-
-          <input
-            id="var-Qh"
-            type="text"
-            bind:value={inputs[useWorkInstead ? 'Wnet' : 'Qh']}
-            placeholder={useWorkInstead ? 'e.g., 150' : 'e.g., 800'}
-          />
-
-        {:else if solveFor === 'Qh'}
-          <label for="var-COP">Coefficient of Performance <span class="small">(COP)</span></label>
-          <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 2.5" />
-
-          <label for="var-Qc">Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span></label>
-          <input id="var-Qc" type="text" bind:value={inputs.Qc} placeholder="e.g., 500" />
-
-        {:else if solveFor === 'Wnet'}
-          <label for="var-COP">Coefficient of Performance <span class="small">(COP)</span></label>
-          <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 2.5" />
-
-          <label for="var-Qc">Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span></label>
-          <input id="var-Qc" type="text" bind:value={inputs.Qc} placeholder="e.g., 500" />
-        {/if}
-      {:else if selectedEqId !== 'heatPumpEfficiency'}
-        {#each activeVariables as v}
-          {#if v.id !== solveFor}
-            <label for={"var-" + v.id}>
-              {v.label}
-              <span class="small">
-                ({@html symbolFor(selectedEqId, v.id)}{unitFor(selectedEqId, v.id) ? `, ${unitFor(selectedEqId, v.id)}` : ''})
-              </span>
-            </label>
-            <input id={"var-" + v.id} type="text" bind:value={inputs[v.id]} placeholder={v.placeholder} />
+      <div class="label-row">
+        <label for="var-Qh">
+          {#if useWorkInstead}
+            Net Work <span class="small">(W<sub>net</sub>, kW)</span>
+          {:else}
+            Heat Rejected <span class="small">(Q<sub>h</sub>, kW)</span>
           {/if}
-        {/each}
-      {/if}
-     {#if selectedEqId !== 'heatPumpEfficiency'}
-      <button class="calculate-btn" on:click={calculate}>Calculate</button>
-      {/if}
+        </label>
+        <button
+          type="button"
+          class="swap-btn"
+          on:click={() => { useWorkInstead = !useWorkInstead; inputs = {}; resultMessage = ''; errorMsg = ''; }}
+        >
+          {@html useWorkInstead ? 'Use Q<sub>h</sub>' : 'Use W<sub>net</sub>'}
+        </button>
+      </div>
+      <input id="var-Qh" type="text" bind:value={inputs[useWorkInstead ? 'Wnet' : 'Qh']} placeholder={useWorkInstead ? 'e.g., 150' : 'e.g., 800'} />
+
+    {:else if solveFor === 'Qc'}
+      <label for="var-COP">Coefficient of Performance <span class="small">(COP)</span></label>
+      <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 2.5" />
+
+      <div class="label-row">
+        <label for="var-Qh">
+          {#if useWorkInstead}
+            Net Work <span class="small">(W<sub>net</sub>, kW)</span>
+          {:else}
+            Heat Rejected <span class="small">(Q<sub>h</sub>, kW)</span>
+          {/if}
+        </label>
+        <button
+          type="button"
+          class="swap-btn"
+          on:click={() => { useWorkInstead = !useWorkInstead; inputs = {}; resultMessage = ''; errorMsg = ''; }}
+        >
+          {@html useWorkInstead ? 'Use Q<sub>h</sub>' : 'Use W<sub>net</sub>'}
+        </button>
+      </div>
+      <input id="var-Qh" type="text" bind:value={inputs[useWorkInstead ? 'Wnet' : 'Qh']} placeholder={useWorkInstead ? 'e.g., 150' : 'e.g., 800'} />
+
+    {:else if solveFor === 'Qh'}
+      <label for="var-COP">Coefficient of Performance <span class="small">(COP)</span></label>
+      <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 2.5" />
+      <label for="var-Qc">Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span></label>
+      <input id="var-Qc" type="text" bind:value={inputs.Qc} placeholder="e.g., 500" />
+
+    {:else if solveFor === 'Wnet'}
+      <label for="var-COP">Coefficient of Performance <span class="small">(COP)</span></label>
+      <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 2.5" />
+      <label for="var-Qc">Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span></label>
+      <input id="var-Qc" type="text" bind:value={inputs.Qc} placeholder="e.g., 500" />
     {/if}
 
-    {#if selectedEqId === 'heatPumpEfficiency'}
-    {#if solveFor}
-      {#if solveFor === 'COP'}
-        <label for="var-Qh">Heat Delivered <span class="small">(Q<sub>h</sub>, kW)</span></label>
-        <input id="var-Qh" type="text" bind:value={inputs.Qh} placeholder="e.g., 800" />
+  {:else if selectedEqId === 'heatPumpEfficiency'}
+    {#if solveFor === 'COP'}
+      <label for="var-Qh">Heat Delivered <span class="small">(Q<sub>h</sub>, kW)</span></label>
+      <input id="var-Qh" type="text" bind:value={inputs.Qh} placeholder="e.g., 800" />
 
-        <div class="label-row">
-          <label for="var-Qc">
-            {#if useWorkInstead}
-              Net Work <span class="small">(W<sub>net</sub>, kW)</span>
-            {:else}
-              Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span>
-            {/if}
-          </label>
+      <div class="label-row">
+        <label for="var-Qc">
+          {#if useWorkInstead}
+            Net Work <span class="small">(W<sub>net</sub>, kW)</span>
+          {:else}
+            Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span>
+          {/if}
+        </label>
+        <button
+          type="button"
+          class="swap-btn"
+          on:click={() => { useWorkInstead = !useWorkInstead; inputs = {}; resultMessage = ''; errorMsg = ''; }}
+        >
+          {@html useWorkInstead ? 'Use Q<sub>c</sub>' : 'Use W<sub>net</sub>'}
+        </button>
+      </div>
+      <input id="var-Qc" type="text" bind:value={inputs[useWorkInstead ? 'Wnet' : 'Qc']} placeholder={useWorkInstead ? 'e.g., 500' : 'e.g., 300'} />
 
-          <button
-            type="button"
-            class="swap-btn"
-            on:click={() => { useWorkInstead = !useWorkInstead; inputs = {}; 
-            resultMessage = "";
-            errorMsg = ""}}
-          >
-            {@html useWorkInstead ? 'Use Q<sub>c</sub>' : 'Use W<sub>net</sub>'}
-          </button>
-        </div>
+    {:else if solveFor === 'Qc'}
+      <label for="var-COP">Coefficient of Performance <span class="small">(COP<sub>HP</sub>)</span></label>
+      <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 4.0" />
+      <label for="var-Qh">Heat Delivered <span class="small">(Q<sub>h</sub>, kW)</span></label>
+      <input id="var-Qh" type="text" bind:value={inputs.Qh} placeholder="e.g., 800" />
 
-        <input
-          id="var-Qc"
-          type="text"
-          bind:value={inputs[useWorkInstead ? 'Wnet' : 'Qc']}
-          placeholder={useWorkInstead ? 'e.g., 500' : 'e.g., 300'}
-        />
+    {:else if solveFor === 'Qh'}
+      <label for="var-COP">Coefficient of Performance <span class="small">(COP<sub>HP</sub>)</span></label>
+      <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 4.0" />
 
-      {:else if solveFor === 'Qc'}
-        <label for="var-COP">Coefficient of Performance <span class="small">(COP<sub>HP</sub>)</span></label>
-        <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 4.0" />
+      <div class="label-row">
+        <label for="var-Qc">
+          {#if useWorkInstead}
+            Net Work <span class="small">(W<sub>net</sub>, kW)</span>
+          {:else}
+            Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span>
+          {/if}
+        </label>
+        <button
+          type="button"
+          class="swap-btn"
+          on:click={() => { useWorkInstead = !useWorkInstead; inputs = {}; resultMessage = ''; errorMsg = ''; }}
+        >
+          {@html useWorkInstead ? 'Use Q<sub>c</sub>' : 'Use W<sub>net</sub>'}
+        </button>
+      </div>
+      <input id="var-Qc" type="text" bind:value={inputs[useWorkInstead ? 'Wnet' : 'Qc']} placeholder={useWorkInstead ? 'e.g., 500' : 'e.g., 300'} />
 
-        <label for="var-Qh">Heat Delivered <span class="small">(Q<sub>h</sub>, kW)</span></label>
-        <input id="var-Qh" type="text" bind:value={inputs.Qh} placeholder="e.g., 800" />
-
-      {:else if solveFor === 'Qh'}
-        <label for="var-COP">Coefficient of Performance <span class="small">(COP<sub>HP</sub>)</span></label>
-        <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 4.0" />
-
-        <div class="label-row">
-          <label for="var-Qc">
-            {#if useWorkInstead}
-              Net Work <span class="small">(W<sub>net</sub>, kW)</span>
-            {:else}
-              Cooling Load <span class="small">(Q<sub>c</sub>, kW)</span>
-            {/if}
-          </label>
-
-          <button
-              type="button"
-              class="swap-btn"
-              on:click={() => {
-                useWorkInstead = !useWorkInstead;
-                inputs = {};
-                resultMessage = ''; // clear result when swapping
-                errorMsg = '';      // clear any errors too
-              }}
-            >
-              {@html useWorkInstead ? 'Use Q<sub>c</sub>' : 'Use W<sub>net</sub>'}
-          </button>
-        </div>
-
-        <input
-          id="var-Qc"
-          type="text"
-          bind:value={inputs[useWorkInstead ? 'Wnet' : 'Qc']}
-          placeholder={useWorkInstead ? 'e.g., 500' : 'e.g., 300'}
-        />
-
-      {:else if solveFor === 'Wnet'}
-        <label for="var-COP">Coefficient of Performance <span class="small">(COP<sub>HP</sub>)</span></label>
-        <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 4.0" />
-
-        <label for="var-Qh">Heat Delivered <span class="small">(Q<sub>h</sub>, kW)</span></label>
-        <input id="var-Qh" type="text" bind:value={inputs.Qh} placeholder="e.g., 800" />
-
-      {/if}
-      <button class="calculate-btn" on:click={calculate}>Calculate</button>
-      {/if}
-
+    {:else if solveFor === 'Wnet'}
+      <label for="var-COP">Coefficient of Performance <span class="small">(COP<sub>HP</sub>)</span></label>
+      <input id="var-COP" type="text" bind:value={inputs.COP} placeholder="e.g., 4.0" />
+      <label for="var-Qh">Heat Delivered <span class="small">(Q<sub>h</sub>, kW)</span></label>
+      <input id="var-Qh" type="text" bind:value={inputs.Qh} placeholder="e.g., 800" />
     {/if}
+
+
+
+
+ {:else if selectedEqId === 'idealGasLaw'}
+  {#if solveFor === 'n'}
+    <label for="var-P">Pressure <span class="small">(P, Pa)</span></label>
+    <input id="var-P" type="text" bind:value={inputs.P} placeholder="e.g., 101325" />
+
+    <label for="var-V">Volume <span class="small">(V, m³)</span></label>
+    <input id="var-V" type="text" bind:value={inputs.V} placeholder="e.g., 0.1" />
+
+    <label for="var-T">Temperature <span class="small">(T, K)</span></label>
+    <input id="var-T" type="text" bind:value={inputs.T} placeholder="e.g., 300" />
+
+
+  {:else if solveFor === 'm'}
+    <label for="var-P">Pressure <span class="small">(P, Pa)</span></label>
+    <input id="var-P" type="text" bind:value={inputs.P} placeholder="e.g., 101325" />
+
+    <label for="var-V">Volume <span class="small">(V, m³)</span></label>
+    <input id="var-V" type="text" bind:value={inputs.V} placeholder="e.g., 0.1" />
+
+    <label for="var-T">Temperature <span class="small">(T, K)</span></label>
+    <input id="var-T" type="text" bind:value={inputs.T} placeholder="e.g., 300" />
+
+    <label for="var-M">Molar Mass <span class="small">(M, kg/mol)</span></label>
+    <input id="var-M" type="text" bind:value={inputs.M} placeholder="e.g., 0.029" />
+
+  {:else if solveFor === 'M'}
+    <label for="var-P">Pressure <span class="small">(P, Pa)</span></label>
+    <input id="var-P" type="text" bind:value={inputs.P} placeholder="e.g., 101325" />
+
+    <label for="var-V">Volume <span class="small">(V, m³)</span></label>
+    <input id="var-V" type="text" bind:value={inputs.V} placeholder="e.g., 0.1" />
+
+    <label for="var-T">Temperature <span class="small">(T, K)</span></label>
+    <input id="var-T" type="text" bind:value={inputs.T} placeholder="e.g., 300" />
+
+    <label for="var-m">Mass <span class="small">(m, kg)</span></label>
+    <input id="var-m" type="text" bind:value={inputs.m} placeholder="e.g., 0.058" />
+
+
+  {:else}
+    {#if !useWorkInstead}
+      <div class="label-row">
+        <label for="var-n">Moles <span class="small">(n, mol)</span></label>
+        <button
+          type="button"
+          class="swap-btn"
+          on:click={() => { useWorkInstead = true; inputs = {}; resultMessage = ''; errorMsg = ''; }}
+        >
+          Use m
+        </button>
+      </div>
+      <input id="var-n" type="text" bind:value={inputs.n} placeholder="e.g., 2" />
+    {:else}
+      <div class="label-row">
+        <label for="var-m">Mass <span class="small">(m, kg)</span></label>
+        <button
+          type="button"
+          class="swap-btn"
+          on:click={() => { useWorkInstead = false; inputs = {}; resultMessage = ''; errorMsg = ''; }}
+        >
+          Use n
+        </button>
+      </div>
+      <input id="var-m" type="text" bind:value={inputs.m} placeholder="e.g., 0.058" />
+
+      <label for="var-M">Molar Mass <span class="small">(M, kg/mol)</span></label>
+      <input id="var-M" type="text" bind:value={inputs.M} placeholder="e.g., 0.029" />
+    {/if}
+
+    {#if solveFor !== 'P'}
+      <label for="var-P">Pressure <span class="small">(P, Pa)</span></label>
+      <input id="var-P" type="text" bind:value={inputs.P} placeholder="e.g., 101325" />
+    {/if}
+
+    {#if solveFor !== 'V'}
+      <label for="var-V">Volume <span class="small">(V, m³)</span></label>
+      <input id="var-V" type="text" bind:value={inputs.V} placeholder="e.g., 0.1" />
+    {/if}
+
+    {#if solveFor !== 'T'}
+      <label for="var-T">Temperature <span class="small">(T, K)</span></label>
+      <input id="var-T" type="text" bind:value={inputs.T} placeholder="e.g., 300" />
+    {/if}
+  {/if}
+
+  {:else}
+    {#each activeVariables as v}
+      {#if v.id !== solveFor}
+        <label for={"var-" + v.id}>
+          {v.label}
+          <span class="small">
+            ({@html symbolFor(selectedEqId, v.id)}{unitFor(selectedEqId, v.id) ? `, ${unitFor(selectedEqId, v.id)}` : ''})
+          </span>
+        </label>
+        <input id={"var-" + v.id} type="text" bind:value={inputs[v.id]} placeholder={v.placeholder} />
+      {/if}
+    {/each}
+  {/if}
+
+  {#if selectedEqId}
+    <button class="calculate-btn" on:click={calculate}>Calculate</button>
+  {/if}
+{/if}
 
 
 
@@ -512,7 +585,7 @@
   }
   .small { font-size: .85em; color: #555; }
 
-  input {
+  select, input {
     width: 100%; padding: 10px; font-size: 1rem;
     border-radius: 6px; border: 1px solid #ccc;
     background: #f2f2f2; color: #333; margin-top: 6px;
