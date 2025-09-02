@@ -80,7 +80,10 @@ onMount(() => {
       currentSlide = 0;
     }}
   >
-    <img src="/images/Logo2.png" alt="Thermo Solver" class="carousel-logo" />
+    <div class="logo-wrapper">
+      <img src="/images/Logo2.png" alt="Thermo Solver" class="carousel-logo" />
+      <span class="beta-tag">beta</span>
+  </div>
   </button>
 {:else}
     <h1>{slides[currentSlide].title}</h1>
@@ -417,6 +420,19 @@ onMount(() => {
   outline: none;
 }
 
+.logo-wrapper {
+  position: relative;
+  display: inline-block;
+}
 
+.beta-tag {
+  position: absolute;
+  top: 73px;        
+  right: -20px;
+  font-size: .95rem;
+  font-weight: 600;
+  color: white; 
+  font-family: 'Montserrat', system-ui, sans-serif;
+}
 
 </style>

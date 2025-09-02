@@ -46,32 +46,29 @@ def molGCPCalculation(substance: str) -> Dict[str, str | float]:
     
     formula, M, R, T_crit, P_crit, V_crit = molGCP_data[substance]
 
-    if substance == "n-butane":
-        return {
-        "Substance<br>": "n-Butane",
-        "Formula<br>": formula,
-        "Molar Mass<br>(kg/kmol)": M,
-        "Gas Constant<br> (R, kJ/kg·K)": R,
-        "Critical Temp<br>(Tₛ, K)": T_crit,
-        "Critical Pressure<br>(Pₛ, MPa)": P_crit,
-        "Critical Volume<br>(Vₛ, m³/kmol)": V_crit
-        }
+
+    refrigerant_names = {
+        "r12": "R-12",
+        "r21": "R-21",
+        "r134a": "R-134a",
+        "r11": "R-11"
+    }
+
+    if substance in refrigerant_names:
+        name = refrigerant_names[substance]
+    elif substance == "n-butane":
+        name = "n-Butane"
     elif substance == "n-hexane":
-        return {
-        "Substance<br>": "n-Hexane",
-        "Formula<br>": formula,
-        "Molar Mass<br>(kg/kmol)": M,
-        "Gas Constant<br> (R, kJ/kg·K)": R,
-        "Critical Temp<br>(Tₛ, K)": T_crit,
-        "Critical Pressure<br>(Pₛ, MPa)": P_crit,
-        "Critical Volume<br>(Vₛ, m³/kmol)": V_crit}
+        name = "n-Hexane"
     else:
-        return {
-        "Substance<br>": substance.replace("_", " ").title(),
+        name = substance.replace("_", " ").title()
+
+    return {
+        "Substance<br>": name,
         "Formula<br>": formula,
         "Molar Mass<br>(kg/kmol)": M,
         "Gas Constant<br> (R, kJ/kg·K)": R,
         "Critical Temp<br>(Tₛ, K)": T_crit,
         "Critical Pressure<br>(Pₛ, MPa)": P_crit,
         "Critical Volume<br>(Vₛ, m³/kmol)": V_crit
-        }
+    }
