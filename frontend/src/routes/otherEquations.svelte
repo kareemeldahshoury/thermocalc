@@ -5,6 +5,8 @@
 
   let useWorkInstead = false;
   let searchText = "";
+  let gammaMode: "TP" | "PV" | "TV" = "TP";
+
 
   const EQUATIONS: EqDef[] = [
     {
@@ -72,7 +74,21 @@
         { id: 'm', label: 'Mass', placeholder: 'e.g., 0.058' },
         { id: 'M', label: 'Molar Mass', placeholder: 'e.g., 0.029' }
       ]
-    }
+    },
+    {
+  id: 'isentropicRelations',
+  title: 'Isentropic Relations',
+  variables: [
+    { id: 'P1', label: 'Initial Pressure', placeholder: 'e.g., 101325' },
+    { id: 'P2', label: 'Final Pressure', placeholder: 'e.g., 202650' },
+    { id: 'T1', label: 'Initial Temperature', placeholder: 'e.g., 300' },
+    { id: 'T2', label: 'Final Temperature', placeholder: 'e.g., 400' },
+    { id: 'V1', label: 'Initial Volume', placeholder: 'e.g., 0.1' },
+    { id: 'V2', label: 'Final Volume', placeholder: 'e.g., 0.05' },
+    { id: 'gamma', label: 'Heat Capacity Ratio', placeholder: 'e.g., 1.4' }
+  ]
+}
+
 
       
   ];
@@ -99,6 +115,13 @@
       m: 'kg',
       M: 'kg/mol'
     },
+    isentropicRelations: {
+      P1: 'Pa', P2: 'Pa',
+      T1: 'K', T2: 'K',
+      V1: 'm³', V2: 'm³',
+      gamma: ''
+    }
+
 
   };
 
@@ -140,7 +163,14 @@
       n: 'n',
       m: 'm',
       M: 'M'
+    },
+    isentropicRelations: {
+      P1: 'P₁', P2: 'P₂',
+      T1: 'T₁', T2: 'T₂',
+      V1: 'V₁', V2: 'V₂',
+      gamma: 'γ'
     }
+
 
 
   };
@@ -206,6 +236,43 @@ if (eqId === "idealGasLaw") {
   if (solveFor === "m") return ["P", "V", "T", "M"];
   if (solveFor === "M") return ["P", "V", "T", "m"];
 }
+
+if (eqId === "isentropicRelations") {
+  if (solveFor === "T1") {
+    if (useWorkInstead) return ["T2", "V1", "V2", "gamma"];
+    else return ["T2", "P1", "P2", "gamma"];                
+  }
+  if (solveFor === "T2") {
+    if (useWorkInstead) return ["T1", "V1", "V2", "gamma"];
+    else return ["T1", "P1", "P2", "gamma"];
+  }
+
+  if (solveFor === "P1") {
+    if (useWorkInstead) return ["P2", "V1", "V2", "gamma"];
+    else return ["P2", "T1", "T2", "gamma"];
+  }
+  if (solveFor === "P2") {
+    if (useWorkInstead) return ["P1", "V1", "V2", "gamma"];
+    else return ["P1", "T1", "T2", "gamma"];
+  }
+
+  if (solveFor === "V1") {
+    if (useWorkInstead) return ["V2", "T1", "T2", "gamma"];
+    else return ["V2", "P1", "P2", "gamma"];
+  }
+  if (solveFor === "V2") {
+    if (useWorkInstead) return ["V1", "T1", "T2", "gamma"];
+    else return ["V1", "P1", "P2", "gamma"];
+  }
+
+  if (solveFor === "gamma") {
+    if (gammaMode === "TP") return ["T1", "T2", "P1", "P2"];
+    if (gammaMode === "PV") return ["P1", "P2", "V1", "V2"];
+    if (gammaMode === "TV") return ["T1", "T2", "V1", "V2"];
+  }
+}
+
+
 
   if (eqId === "erb1SteadyState" || eqId === "carnotEfficiency" || eqId == "massFlowRate") {
     return activeVariables.map(v => v.id).filter(id => id !== solveFor);
@@ -282,14 +349,13 @@ if (eqId === "idealGasLaw") {
   id="eqDropdown"
   bind:value={selectedEqId}
   on:change={() => {
-    // Reset calculation state
+
     solveFor = "";
     inputs = {};
     resultMessage = "";  
     errorMsg = "";
     useWorkInstead = false;
 
-    // validate equation exists
     const match = EQUATIONS.find(e => e.id === selectedEqId);
     if (!match) {
       selectedEqId = "";
@@ -492,7 +558,7 @@ if (eqId === "idealGasLaw") {
           class="swap-btn"
           on:click={() => { useWorkInstead = true; inputs = {}; resultMessage = ''; errorMsg = ''; }}
         >
-          Use m
+          Use Mass
         </button>
       </div>
       <input id="var-n" type="text" bind:value={inputs.n} placeholder="e.g., 2" />
@@ -504,7 +570,7 @@ if (eqId === "idealGasLaw") {
           class="swap-btn"
           on:click={() => { useWorkInstead = false; inputs = {}; resultMessage = ''; errorMsg = ''; }}
         >
-          Use n
+          Use Moles
         </button>
       </div>
       <input id="var-m" type="text" bind:value={inputs.m} placeholder="e.g., 0.058" />
@@ -528,6 +594,226 @@ if (eqId === "idealGasLaw") {
       <input id="var-T" type="text" bind:value={inputs.T} placeholder="e.g., 300" />
     {/if}
   {/if}
+
+  {:else if selectedEqId === 'isentropicRelations'}
+  {#if solveFor === 'T1' || solveFor === 'T2'}
+    {#if !useWorkInstead}
+      <div class="label-row">
+        <label for="var-P1">Initial Pressure <span class="small">(P₁, Pa)</span></label>
+        <button
+          type="button"
+          class="swap-btn"
+          on:click={() => { useWorkInstead = true; inputs = {}; resultMessage = ''; errorMsg = ''; }}
+        >
+          Use Volume Instead
+        </button>
+      </div>
+      <input id="var-P1" type="text" bind:value={inputs.P1} placeholder="e.g., 101325" />
+
+      <label for="var-P2">Final Pressure <span class="small">(P₂, Pa)</span></label>
+      <input id="var-P2" type="text" bind:value={inputs.P2} placeholder="e.g., 202650" />
+
+    {:else}
+      <div class="label-row">
+        <label for="var-V1">Initial Volume <span class="small">(V₁, m³)</span></label>
+        <button
+          type="button"
+          class="swap-btn"
+          on:click={() => { useWorkInstead = false; inputs = {}; resultMessage = ''; errorMsg = ''; }}
+        >
+          Use Pressure Instead
+        </button>
+      </div>
+      <input id="var-V1" type="text" bind:value={inputs.V1} placeholder="e.g., 0.1" />
+
+      <label for="var-V2">Final Volume <span class="small">(V₂, m³)</span></label>
+      <input id="var-V2" type="text" bind:value={inputs.V2} placeholder="e.g., 0.05" />
+    {/if}
+
+    {#if solveFor !== 'T1'}
+      <label for="var-T1">Initial Temperature <span class="small">(T₁, K)</span></label>
+      <input id="var-T1" type="text" bind:value={inputs.T1} placeholder="e.g., 300" />
+    {:else}
+      <label for="var-T2">Final Temperature <span class="small">(T₂, K)</span></label>
+      <input id="var-T2" type="text" bind:value={inputs.T2} placeholder="e.g., 300" />
+    {/if}
+
+    <label for="var-gamma">Heat Capacity Ratio <span class="small">(γ)</span></label>
+    <input id="var-gamma" type="text" bind:value={inputs.gamma} placeholder="e.g., 1.4" />
+
+
+
+  {:else if solveFor === 'P1' || solveFor === 'P2'}
+    {#if !useWorkInstead}
+      <div class="label-row">
+        <label for="var-T1">Initial Temperature <span class="small">(T₁, K)</span></label>
+        <button
+          type="button"
+          class="swap-btn"
+          on:click={() => { useWorkInstead = true; inputs = {}; resultMessage = ''; errorMsg = ''; }}
+        >
+          Use Volume Instead
+        </button>
+      </div>
+      <input id="var-T1" type="text" bind:value={inputs.T1} placeholder="e.g., 300" />
+
+      <label for="var-T2">Final Temperature <span class="small">(T₂, K)</span></label>
+      <input id="var-T2" type="text" bind:value={inputs.T2} placeholder="e.g., 600" />
+
+    {:else}
+      <div class="label-row">
+        <label for="var-V1">Initial Volume <span class="small">(V₁, m³)</span></label>
+        <button
+          type="button"
+          class="swap-btn"
+          on:click={() => { useWorkInstead = false; inputs = {}; resultMessage = ''; errorMsg = ''; }}
+        >
+          Use Temperature Instead
+        </button>
+      </div>
+      <input id="var-V1" type="text" bind:value={inputs.V1} placeholder="e.g., 0.1" />
+
+      <label for="var-V2">Final Volume <span class="small">(V₂, m³)</span></label>
+      <input id="var-V2" type="text" bind:value={inputs.V2} placeholder="e.g., 0.05" />
+    {/if}
+
+    {#if solveFor !== 'P1'}
+      <label for="var-P1">Initial Pressure <span class="small">(P₁, Pa)</span></label>
+      <input id="var-P1" type="text" bind:value={inputs.P1} placeholder="e.g., 101325" />
+    {:else}
+      <label for="var-P2">Final Pressure <span class="small">(P₂, Pa)</span></label>
+      <input id="var-P2" type="text" bind:value={inputs.P2} placeholder="e.g., 202650" />
+    {/if}
+
+    <label for="var-gamma">Heat Capacity Ratio <span class="small">(γ)</span></label>
+    <input id="var-gamma" type="text" bind:value={inputs.gamma} placeholder="e.g., 1.4" />
+
+  {:else if solveFor === 'V1' || solveFor === 'V2'}
+    {#if !useWorkInstead}
+      <div class="label-row">
+        <label for="var-P1">Initial Pressure <span class="small">(P₁, Pa)</span></label>
+        <button
+          type="button"
+          class="swap-btn"
+          on:click={() => { useWorkInstead = true; inputs = {}; resultMessage = ''; errorMsg = ''; }}
+        >
+          Use Temperature Instead
+        </button>
+      </div>
+      <input id="var-P1" type="text" bind:value={inputs.P1} placeholder="e.g., 101325" />
+
+      <label for="var-P2">Final Pressure <span class="small">(P₂, Pa)</span></label>
+      <input id="var-P2" type="text" bind:value={inputs.P2} placeholder="e.g., 202650" />
+
+    {:else}
+      <div class="label-row">
+        <label for="var-T1">Initial Temperature <span class="small">(T₁, K)</span></label>
+        <button
+          type="button"
+          class="swap-btn"
+          on:click={() => { useWorkInstead = false; inputs = {}; resultMessage = ''; errorMsg = ''; }}
+        >
+          Use Pressure Instead
+        </button>
+      </div>
+      <input id="var-T1" type="text" bind:value={inputs.T1} placeholder="e.g., 300" />
+
+      <label for="var-T2">Final Temperature <span class="small">(T₂, K)</span></label>
+      <input id="var-T2" type="text" bind:value={inputs.T2} placeholder="e.g., 600" />
+    {/if}
+
+    {#if solveFor !== 'V1'}
+      <label for="var-V1">Initial Volume <span class="small">(V₁, m³)</span></label>
+      <input id="var-V1" type="text" bind:value={inputs.V1} placeholder="e.g., 0.1" />
+    {:else}
+      <label for="var-V2">Final Volume <span class="small">(V₂, m³)</span></label>
+      <input id="var-V2" type="text" bind:value={inputs.V2} placeholder="e.g., 0.05" />
+    {/if}
+
+    <label for="var-gamma">Heat Capacity Ratio <span class="small">(γ)</span></label>
+    <input id="var-gamma" type="text" bind:value={inputs.gamma} placeholder="e.g., 1.4" />
+
+  {:else if solveFor === 'gamma'}
+  {#if gammaMode === 'TP'}
+    <!-- T–P relation -->
+    <div class="label-row">
+      <label for="var-T1">Initial Temperature <span class="small">(T₁, K)</span></label>
+      <button
+        type="button"
+        class="swap-btn"
+        on:click={() => { 
+          gammaMode = "PV"; 
+          inputs = {}; resultMessage = ''; errorMsg = ''; 
+        }}
+      >
+        Use Pressure/Volume Instead
+      </button>
+    </div>
+    <input id="var-T1" type="text" bind:value={inputs.T1} placeholder="e.g., 300" />
+
+    <label for="var-T2">Final Temperature <span class="small">(T₂, K)</span></label>
+    <input id="var-T2" type="text" bind:value={inputs.T2} placeholder="e.g., 600" />
+
+    <label for="var-P1">Initial Pressure <span class="small">(P₁, Pa)</span></label>
+    <input id="var-P1" type="text" bind:value={inputs.P1} placeholder="e.g., 101325" />
+
+    <label for="var-P2">Final Pressure <span class="small">(P₂, Pa)</span></label>
+    <input id="var-P2" type="text" bind:value={inputs.P2} placeholder="e.g., 202650" />
+
+  {:else if gammaMode === 'PV'}
+    <div class="label-row">
+      <label for="var-P1">Initial Pressure <span class="small">(P₁, Pa)</span></label>
+      <button
+        type="button"
+        class="swap-btn"
+        on:click={() => { 
+          gammaMode = "TV"; 
+          inputs = {}; resultMessage = ''; errorMsg = ''; 
+        }}
+      >
+        Use Temperature/Volume Instead
+      </button>
+    </div>
+    <input id="var-P1" type="text" bind:value={inputs.P1} placeholder="e.g., 101325" />
+
+    <label for="var-P2">Final Pressure <span class="small">(P₂, Pa)</span></label>
+    <input id="var-P2" type="text" bind:value={inputs.P2} placeholder="e.g., 202650" />
+
+    <label for="var-V1">Initial Volume <span class="small">(V₁, m³)</span></label>
+    <input id="var-V1" type="text" bind:value={inputs.V1} placeholder="e.g., 0.1" />
+
+    <label for="var-V2">Final Volume <span class="small">(V₂, m³)</span></label>
+    <input id="var-V2" type="text" bind:value={inputs.V2} placeholder="e.g., 0.05" />
+
+  {:else if gammaMode === 'TV'}
+    <div class="label-row">
+      <label for="var-T1">Initial Temperature <span class="small">(T₁, K)</span></label>
+      <button
+        type="button"
+        class="swap-btn"
+        on:click={() => { 
+          gammaMode = "TP"; 
+          inputs = {}; resultMessage = ''; errorMsg = ''; 
+        }}
+      >
+        Use Temperature/Pressure Instead
+      </button>
+    </div>
+    <input id="var-T1" type="text" bind:value={inputs.T1} placeholder="e.g., 300" />
+
+    <label for="var-T2">Final Temperature <span class="small">(T₂, K)</span></label>
+    <input id="var-T2" type="text" bind:value={inputs.T2} placeholder="e.g., 600" />
+
+    <label for="var-V1">Initial Volume <span class="small">(V₁, m³)</span></label>
+    <input id="var-V1" type="text" bind:value={inputs.V1} placeholder="e.g., 0.1" />
+
+    <label for="var-V2">Final Volume <span class="small">(V₂, m³)</span></label>
+    <input id="var-V2" type="text" bind:value={inputs.V2} placeholder="e.g., 0.05" />
+  {/if}
+{/if}
+
+
+
 
   {:else}
     {#each activeVariables as v}
