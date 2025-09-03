@@ -217,11 +217,7 @@ onMount(() => {
 
 <style>
 :global(body, html) {
-  margin: 0;
-  padding: 0;
-  background-color: #ffffff;
-  font-family: system-ui, sans-serif;
-  height: 100%;
+  /* font-family: system-ui, sans-serif; */
 }
 
 .page {
@@ -230,13 +226,11 @@ onMount(() => {
   height: 100vh;
 }
 
-
-
 .layout {
   display: flex;
   flex-grow: 1;
   background-color: #ffffff;
-  margin-top: 24px;
+  margin-top: 0px;
 }
 
 .sidebar {
@@ -280,14 +274,14 @@ onMount(() => {
   background-color: #ffffff;
   font-weight: bold;
   border-left: 4px solid #7A0019;
-  border-top: 1.5px solid #7A0019;
-  border-bottom: 1.5px solid #7A0019;
+  border-top: 2px solid #7A0019;
+  border-bottom: 2px solid #7A0019;
 }
 
 .main-content {
   flex-grow: 1;
   padding: 40px;
-  background-color: #ffffff;
+  background-color: white;
   color: #333;
   overflow-y: auto;
   margin-top: 16px;
@@ -323,7 +317,7 @@ onMount(() => {
 .section-divider {
   width: 100%;
   height: 25px;
-  background-color: #f9f9f9;
+  background-color: white;
 }
 
 .howto-content {
@@ -432,7 +426,7 @@ onMount(() => {
   font-size: .95rem;
   font-weight: 600;
   color: white; 
-  font-family: 'Montserrat', system-ui, sans-serif;
+  /* font-family: 'Montserrat', system-ui, sans-serif; */
 }
 
 </style>
