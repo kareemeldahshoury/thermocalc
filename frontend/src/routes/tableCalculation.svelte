@@ -507,29 +507,25 @@ const response = await fetch(endpoint, {
 
 
 <style>
-  :global(body) {
-    background-color: #7A0019;
-    margin: 0;
-    font-family: 'Latin Modern Math', 'STIX Two Math', 'Cambria Math', serif;
-    color: white;
-  }
+
 
   .container {
     max-width: 800px;
     margin: -10px auto;
     padding: 5px 30px 30px 30px;
-    background-color: white;
+    background: #fff;
     color: #000;
     border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
     font-family: system-ui, sans-serif;
   }
 
   .header-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    font-size: 1.4rem;
+    color: #7A0019;
+    font-weight: 700;
     margin-top: 27px;
+    margin-bottom: 6px;
   }
 
   .header-bar h2 {

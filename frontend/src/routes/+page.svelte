@@ -216,10 +216,12 @@ onMount(() => {
 </div>
 
 <style>
-/* :global(body, html) {
-  font-family: system-ui, sans-serif;
-} */
-
+:global(body, html) {
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  height: 100%
+}
 .page {
   display: flex;
   flex-direction: column;
@@ -249,7 +251,7 @@ onMount(() => {
   flex-direction: column;
   width: 100%;
   background-color: transparent;
-  margin-top: 1px;
+  margin-top: 25px;
   gap: 2px;
   margin-right: 0px;
 }
@@ -317,7 +319,7 @@ onMount(() => {
 .section-divider {
   width: 100%;
   height: 25px;
-  background-color: white;
+  background-color: #f9f9f9;
 }
 
 .howto-content {

@@ -190,12 +190,6 @@
 {/if}
 
 <style>
-  :global(body) {
-    background-color: #7A0019;
-    margin: 0;
-    font-family: 'Latin Modern Math', 'STIX Two Math', 'Cambria Math', serif;
-    color: white;
-  }
 
   .conversion-table {
     max-width: 800px;
