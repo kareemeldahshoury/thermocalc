@@ -1,15 +1,22 @@
 <script lang="ts">
-  type PracticeQuestion = {
-    id: string;
-    image: string;
-    num_answers: number;
-  };
+
+
+ type PracticeQuestion = {
+  id: string;
+  num_answers: number;
+  image?: string;
+  prompt?: string;
+  format?: 'text' | 'image' | 'unknown';
+  prompt_title?: string;
+  prompt_body?: string
+};
+
 
   let availableUnits = [
-    { id: 'unitConversion', label: 'Unit Conversion' },
-    { id: 'firstLaw', label: 'First Law' },
-    { id: 'secondLaw', label: 'Second Law' },
-    { id: 'refrigeration', label: 'Refrigeration' }
+    { id: 'unitConversion', label: 'Unit Conversion / First Law' },
+    { id: 'sysProperties', label: 'Properties of Systems'},
+    { id: 'secondLaw', label: 'Second Law & Entropy' },
+    { id: 'refrigeration', label: 'Refrigeration / Heat Engines' }
   ];
 
   let selectedUnit: string | null = null;
@@ -51,7 +58,7 @@
       alert("No questions available.");
       return;
     }
-    completed = true; // show message in main container
+    completed = true;
     return;
   }
 
@@ -111,6 +118,15 @@ function startOver() {
     showResult = true;
   }
 
+  function skipQuestion() {
+  if (!question) return;
+
+  questionIds.push(question.id);
+
+  loadQuestion();
+}
+
+
   function backToUnits() {
     selectedUnit = null;
     question = null;
@@ -144,9 +160,22 @@ function startOver() {
       <button class="back-btn" on:click={backToUnits}>Back to Units</button>
     </div>
 
-    <div class="image-box">
-      <img src={`http://localhost:8000${question.image}`} alt="Practice Problem" />
+    <div class="question-box">
+      {#if question?.prompt}
+        <div class="prompt">{@html question.prompt}</div>
+      {/if}
+
+      {#if question?.image}
+        <div class="image-box">
+          <img src={`http://localhost:8000${question.image}`} alt="Practice Problem" />
+        </div>
+      {/if}
     </div>
+
+
+
+
+
 
     <div class="input-group">
       {#each userAnswers as _, i}
@@ -154,27 +183,34 @@ function startOver() {
           type="number"
           step="any"
           bind:value={userAnswers[i]}
-          placeholder={`Answer ${String.fromCharCode(65 + i)}`}
+          placeholder={`Answer ${String.fromCharCode(97 + i)}`}
           class:selected-correct={showResult && result[i] === true}
           class:selected-incorrect={showResult && result[i] === false}
-          disabled={showResult && allCorrect()}
+          disabled={showResult}
         />
       {/each}
     </div>
 
-    {#if !showResult}
+  {#if !showResult}
+    <div class="button-row">
+      <button class="skip-btn" on:click={skipQuestion}>Skip Question</button>
       <button class="submit-btn" on:click={submitAnswer}>Check Answer</button>
-    {:else if !allCorrect()}
+    </div>
+  {:else if !allCorrect()}
+    <div class="button-row">
+      <button class="skip-btn" on:click={skipQuestion}>Skip Question</button>
       <button class="submit-btn" on:click={() => (showResult = false)}>Try Again</button>
-    {/if}
+    </div>
+  {/if}
 
-    {#if showResult}
-      <div class="results">
-        {#if allCorrect()}
-          <button on:click={loadQuestion}>Try Another</button>
-        {/if}
-      </div>
-    {/if}
+  {#if showResult}
+    <div class="results">
+      {#if allCorrect()}
+        <button on:click={loadQuestion}>Try Another</button>
+      {/if}
+    </div>
+  {/if}
+
   {/if}
 </div>
 
@@ -186,6 +222,7 @@ function startOver() {
   }
 
   .practice-container {
+    position: relative;
     max-width: 800px;
     margin: -10px auto;
     padding: 30px 30px 35px 30px;
@@ -209,8 +246,6 @@ function startOver() {
   }
 
   .unit-buttons button,
-  .submit-btn,
-  .back-btn,
   .results button {
     padding: 10px 20px;
     background-color: #7A0019;
@@ -220,6 +255,18 @@ function startOver() {
     font-size: 1rem;
     cursor: pointer;
   }
+
+  .back-btn {
+    padding: 5px 10px;
+    margin-top: 8px;
+    background-color: #7A0019;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: .8rem;
+    cursor: pointer;
+  }
+  
 
   .unit-buttons button:hover,
   .submit-btn:hover,
@@ -274,23 +321,26 @@ function startOver() {
   }
 
   input.selected-correct {
-    border: 2px solid green;
+    border: 1px solid green;
     background-color: #e6ffed;
   }
 
   input.selected-incorrect {
-    border: 2px solid red;
+    border: 1px solid red;
     background-color: #ffe6e6;
   }
 
   .results {
     text-align: center;
-    margin-top: 20px;
   }
 
   .completed-message {
     text-align: center;
-    padding: 40px 20px;
+    margin-top: 20px;
+    min-height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .completed-message h2 {
@@ -318,9 +368,79 @@ function startOver() {
 
 .practice-container h2 {
   text-align: center;
-  font-size: 1.5rem;   /* increase heading size */
+  font-size: 1.5rem;
   font-weight: 700;
   
 }
+
+.prompt {
+  white-space: pre-wrap;
+  padding: 16px;
+  font-size: 1rem;
+  line-height: 1.4;
+  margin-bottom: 24px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 10px
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.skip-btn,
+.submit-btn {
+  padding: 10px 20px;
+  background-color: #7A0019;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.skip-btn:hover,
+.submit-btn:hover {
+  background-color: #9c0033;
+}
+
+.question-box {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 5px;
+  margin-bottom: 24px;
+  background: white;
+}
+
+.prompt {
+  white-space: pre-wrap;
+  font-size: 1rem;
+  line-height: 1.4;
+  margin-bottom: 5px;
+  text-align: center;
+  border: none;
+}
+
+.image-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-box img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: none;
+}
+
+
+
+
 
 </style>

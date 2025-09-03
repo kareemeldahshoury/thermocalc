@@ -13,7 +13,7 @@ from backend.core.calculations.questions import questions_by_unit
 import random
 from fastapi import Body
 from fastapi import APIRouter, Query
-from backend.core.calculations.questions import (questions_firstLaw, questions_unitConversion)
+from backend.core.calculations.questions import (questions_sysProperties, questions_unitConversion)
 from typing import Dict
 
 app = FastAPI()
@@ -178,11 +178,17 @@ def get_random_question(unit: str = Query(...)):
     q_id = random.choice(list(questions.keys()))
     q = questions[q_id]
 
-    return {
+    result = {
         "id": q_id,
-        "image": q["image"],
-        "num_answers": len(q["answers"])
+        "num_answers": len(q["answers"]),
     }
+
+    if "prompt" in q:
+        result["prompt"] = q["prompt"]
+    if "image" in q:
+        result["image"] = q["image"]
+
+    return result
 
 
 
@@ -220,7 +226,7 @@ def list_question_ids(unit: str):
     # Assuming you store questions like questions_unitConversion, etc.
     unit_map = {
         "unitConversion": questions_unitConversion,
-        "firstLaw": questions_firstLaw,
+        "sysProperties": questions_sysProperties,
         # Add others
     }
     if unit not in unit_map:
@@ -236,17 +242,21 @@ def get_question_by_id(id: str = Query(...), unit: str = Query(...)):
         return {"error": f"Invalid unit category: {unit}"}
 
     questions = questions_by_unit[unit]
-
     if id not in questions:
         return {"error": f"Invalid question ID: {id}"}
 
     q = questions[id]
-    return {
+    result = {
         "id": id,
-        "image": q["image"],
-        "num_answers": len(q["answers"])
+        "num_answers": len(q["answers"]),
     }
 
+    if "prompt" in q:
+        result["prompt"] = q["prompt"]
+    if "image" in q:
+        result["image"] = q["image"]
+
+    return result
 
 @app.post("/api/calculate/general")
 def calculate_general(req: GeneralSolveRequest):
