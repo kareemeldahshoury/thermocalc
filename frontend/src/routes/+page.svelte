@@ -216,9 +216,9 @@ onMount(() => {
 </div>
 
 <style>
-:global(body, html) {
-  /* font-family: system-ui, sans-serif; */
-}
+/* :global(body, html) {
+  font-family: system-ui, sans-serif;
+} */
 
 .page {
   display: flex;
