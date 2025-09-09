@@ -157,7 +157,7 @@
   }
 
   .group h3 {
-    color: #F58220;
+    color: #7A0019;
     font-size: 1.2rem;
     margin-bottom: 10px;
   }

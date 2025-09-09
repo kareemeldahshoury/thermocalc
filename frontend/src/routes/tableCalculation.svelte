@@ -510,14 +510,14 @@ const response = await fetch(endpoint, {
 
 
   .container {
-    max-width: 800px;
-    margin: -10px auto;
-    padding: 5px 30px 30px 30px;
-    background: #fff;
-    color: #000;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    font-family: system-ui, sans-serif;
+  max-width: 800px;
+  margin: -10px auto;
+  padding: 5px 30px 30px 30px;
+  background: #fff;
+  color: #000;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  font-family: system-ui, sans-serif;
   }
 
   .header-bar {
@@ -529,10 +529,10 @@ const response = await fetch(endpoint, {
   }
 
   .header-bar h2 {
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: #7A0019;
-    margin: 0;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #7A0019;
+      margin: 0 0 6px 0;
   }
 
   label {

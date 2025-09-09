@@ -921,6 +921,7 @@ if (eqId === "isentropicRelations") {
     width: 100%; padding: 10px; font-size: 1rem;
     border-radius: 6px; border: 1px solid #ccc;
     background: #f2f2f2; color: #333; margin-top: 6px;
+    margin-bottom: 16px
   }
 
   .group-label { display: block; font-size: 1rem; margin-top: 28px; margin-bottom: 6px; color: #222; font-weight: 700; }

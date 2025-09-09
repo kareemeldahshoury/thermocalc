@@ -248,34 +248,17 @@
 function toggleProcessInfo() {
   showProcessInfo = !showProcessInfo;
 }
-
-
 </script>
 
-<div class="hidden">
-  <span class="frac"><span class="num"></span><span class="den"></span></span>
-</div>
 
 
 {#if showProcessInfo}
   <ProcessInfo />
-  <div class="top-right-btn">
-    <button class="nav-btn" on:click={() => showProcessInfo = false}>
-      Back to Calculator
-    </button>
-  </div>
 {:else}
   <div class="container">
-    <div class="header-row">
+    <div class="header-bar">
       <h2>Thermodynamic Work Calculator</h2>
     </div>
-
-    <div class="button-wrapper">
-      <button class="top-right-button" on:click={toggleProcessInfo}>
-      Processes Information
-      </button>
-    </div>
-
 
     <label for="process">Select Thermodynamic Process:</label>
     <select
@@ -370,53 +353,53 @@ function toggleProcessInfo() {
 
 
  
-
 <style>
-  :global(body) {
-  background-color: #7A0019;
-    margin: 0;
-    font-family: 'Latin Modern Math', 'STIX Two Math', 'Cambria Math', serif;
-    color: white;
-  }
-
 .container {
   max-width: 800px;
-    margin: -10px auto;
-    padding: 5px 30px 30px 30px;
-    background-color: white;
-    color: #000;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    font-family: system-ui, sans-serif;
+  margin: -10px auto;
+  padding: 5px 30px 30px 30px;
+  background: #fff;
+  color: #000;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  font-family: system-ui, sans-serif;
 }
 
-h2 {
-  font-size: 1.4rem;
-  color: #800000; /* maroon */
-  font-weight: 700;
-  margin-top: 27px;
-  text-align: left;
-}
+  .header-bar {
+    font-size: 1.4rem;
+    color: #7A0019;
+    font-weight: 700;
+    margin-top: 27px;
+    margin-bottom: 6px;
+  }
 
-label {
-  display: block;
-  font-size: 1.05rem;
-  margin-top: 38px;
-  color: #222;
-  font-weight: 700
-}
+  .header-bar h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #7A0019;
+      margin: 0 0 6px 0;
+  }
+
+  label {
+    font-weight: bold;
+    display: block;
+    margin-top: 42px;
+    margin-bottom: 6px;
+    font-size: 1rem;
+  }
 
 select,
 input {
-  width: 100%;
-  padding: 12px;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  background-color: #f2f2f2;
-  color: #333;
-  margin-top: 6px;
+    width: 100%;
+    min-width: 300px;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #f2f2f2;
+    color: black;
+    margin-bottom: 16px;
+    box-sizing: border-box;
 }
 
 input::placeholder {
@@ -428,7 +411,6 @@ input::placeholder {
   color: #555;
   font-weight: 700;
 }
-
 
 input:disabled {
   background-color: #f2f2f2;
@@ -444,9 +426,9 @@ input:disabled {
 }
 
 .equation-buttons :global(button.selected) {
-    outline: 2px solid #7A0019;
-    outline-offset: 2px;
-    box-shadow: 0 0 0 2px #fff;
+  outline: 2px solid #7A0019;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px #fff;
 }
 
 .equation-buttons button {
@@ -462,15 +444,15 @@ input:disabled {
 
 .calculate-btn {
   background-color: #7A0019;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    font-weight: bold;
-    font-size: 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    margin-top: 35px;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 35px;
 }
 
 .calculate-btn:hover {
@@ -515,36 +497,6 @@ th {
   text-align: center;
 }
 
-.button-wrapper {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.top-right-button {
-  background-color: #7A0019;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  font-size: .88rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: -33px
-}
-
-.nav-btn {
-  background-color: #7A0019;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  font-size: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  margin-top: -32px;
-  margin-left: 750px
-}
-
 :global(.frac) {
   display: inline-flex;
   flex-direction: column;
@@ -564,6 +516,4 @@ th {
   margin-top: .1em;
   padding: .1em .15em 0;
 }
-
-
 </style>

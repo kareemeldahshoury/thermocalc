@@ -128,14 +128,14 @@
 
 {#if showTable}
   <ConversionTable />
-  <div class="top-right-btn">
+  <!-- <div class="top-right-btn">
     <button class="nav-btn" on:click={toggleView}>Back to Calculator</button>
-  </div>
+  </div> -->
 {:else}
   <div class="conversion-table">
-    <div class="top-right-btn">
+    <!-- <div class="top-right-btn">
       <button class="nav-btn" on:click={toggleView}>Conversion Table</button>
-    </div>
+    </div> -->
 
     <h2>Conversion Calculator</h2>
 
@@ -191,21 +191,24 @@
 
 <style>
 
-  .conversion-table {
-    max-width: 800px;
-    margin: -10px auto;
-    padding: 5px 30px 30px 30px;
-    background-color: white;
-    color: black;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-  }
+.conversion-table {
+  max-width: 800px;
+  margin: -10px auto;
+  padding: 5px 30px 30px 30px; 
+  background: #fff;
+  color: #000;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  font-family: system-ui, sans-serif;
+}
+
 
   label {
     font-weight: bold;
     display: block;
     margin-top: 42px;
     margin-bottom: 6px;
+    align-items: center
   }
 
   select,
@@ -222,10 +225,11 @@
   }
 
   h2 {
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: #7A0019;
-    margin-top: -40px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #7A0019;
+      margin-top: 27px;
+      align-items: center;
   }
 
   .calc-btn {
@@ -256,26 +260,5 @@
     white-space: nowrap;
     overflow-x: auto;
     max-width: 100%;
-  }
-
-  .top-right-btn {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 30px;
-  }
-
-  .nav-btn {
-    background-color: #7A0019;
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    font-size: 0.9rem;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-
-  .nav-btn:hover {
-    background-color: #9c0033;
   }
 </style>

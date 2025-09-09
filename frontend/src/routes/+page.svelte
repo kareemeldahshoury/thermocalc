@@ -6,6 +6,7 @@
   import { onMount } from 'svelte';
   import OtherEquations from './otherEquations.svelte';
   import ComingSoon from './comingSoon.svelte';
+  import KeyEquationsThermo from './keyEquationsThermo.svelte';
 
 
 
@@ -70,42 +71,25 @@ onMount(() => {
 
 
 
-<div class="carousel-banner">
- {#if slides[currentSlide].type === 'logo'}
-  <button
-    class="logo-button"
-    on:click={() => {
+<div class="logo-banner">
+  <a
+    href="/"
+    class="logo-link"
+    on:click|preventDefault={() => {
       selectedSubject = '';
       selectedCalculator = '';
-      currentSlide = 0;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }}
   >
     <div class="logo-wrapper">
-      <img src="/images/Logo2.png" alt="Thermo Solver" class="carousel-logo" />
+      <img src="/images/Logo2.png" alt="Thermo Solver" class="logo" />
       <span class="beta-tag">beta</span>
-  </div>
-  </button>
-{:else}
-    <h1>{slides[currentSlide].title}</h1>
-    <p>{slides[currentSlide].subtitle}</p>
-    {#if slides[currentSlide].cta}
-      <button
-        class="cta-btn"
-        disabled={!!(selectedSubject || selectedCalculator)}
-        on:click={() => {
-          const calc = slides[currentSlide].targetCalculator;
-          if (calc && !selectedCalculator && !selectedSubject) {
-            selectedSubject = 'thermo';
-            selectedCalculator = calc;
-            document.querySelector('.main-content')?.scrollIntoView({ behavior: 'smooth' });
-          }
-        }}
-      >
-        {slides[currentSlide].cta}
-      </button>
-    {/if}
-  {/if}
+    </div>
+  </a>
 </div>
+
+
+
 
 
 
@@ -159,7 +143,7 @@ onMount(() => {
           <button
             class:selected={selectedCalculator === 'calc6'}
             on:click={() => { selectedCalculator = 'calc6'; }}>
-            Key Equations
+            Additional Tools
           </button>
         </div>
       </nav>
@@ -207,7 +191,7 @@ onMount(() => {
       {:else if selectedCalculator === 'calc5'}
         <PracticeProblems />
       {:else if selectedCalculator === 'calc6'}
-      <p> test </p>
+       <KeyEquationsThermo />
       {:else}
         <p></p>
       {/if}
@@ -303,7 +287,7 @@ onMount(() => {
   background: none;
   border: none;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 550;
   padding: 8px 12px;
   color: #000000;
   cursor: pointer;
@@ -357,63 +341,17 @@ onMount(() => {
 }
 
 
-.carousel-banner {
+.logo-banner {
   background: linear-gradient(to right, #7A0019, #f78b00);
-  padding: 10px 10px;
+  padding: 10px;
   text-align: center;
   color: white;
-  transition: all 0.6s ease-in-out;
-  height: 130px;
-  overflow: hidden
 }
 
-
-.carousel-logo {
-  height: 90px; 
-  max-width: none;     
-  margin: 0 auto 20px auto;
+.logo {
+  height: 90px;
   display: block;
-  margin-top: 5px;
-}
-
-
-
-.carousel-banner h1 {
-  font-size: clamp(1.2rem, 2vw, 1.75rem);
-  font-weight: 800;
-  margin-bottom: 12px;
-}
-
-.carousel-banner p {
-  font-size: clamp(0.9rem, 1.6vw, 1.05rem);
-  margin-bottom: 15px;
-}
-
-.cta-btn {
-  background: white;
-  color: #7A0019;
-  font-weight: bold;
-  border: none;
-  padding: 10px 20px;
-  font-size: .8rem;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.cta-btn:hover {
-  background: #f3f3f3;
-}
-
-.logo-button {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-}
-
-.logo-button:focus {
-  outline: none;
+  margin: 0 auto;
 }
 
 .logo-wrapper {
@@ -423,7 +361,22 @@ onMount(() => {
 
 .beta-tag {
   position: absolute;
-  top: 73px;        
+  top: 77px;   /* adjust as needed */
+  right: -20px;
+  font-size: .95rem;
+  font-weight: 600;
+  color: white;
+}
+
+
+.logo-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.beta-tag {
+  position: absolute;
+  top: 77px;        
   right: -20px;
   font-size: .95rem;
   font-weight: 600;
